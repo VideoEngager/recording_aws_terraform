@@ -1,6 +1,6 @@
 # Recording Infrastructure Deployment
 
-## Badic info
+## Basic info
 
 This repo will deploy recording infrastructure w/ elastic IP address for Kurento Media Servers. Recording infrastructure's basic building blocks are:
 * application load balancer with sticky sessions
