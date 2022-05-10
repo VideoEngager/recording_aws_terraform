@@ -40,33 +40,17 @@ resource "aws_cloudwatch_log_group" "kurento_log_group" {
 
 
 
-resource "aws_cloudwatch_log_stream" "kurento_log_stream_1" {
-  name           = "logs-kurento-worker-1"
+resource "aws_cloudwatch_log_stream" "kurento_log_streams" {
+  count          = var.nodes_count 
+  name           = "logs-kurento-worker-${count.index+1}"
   log_group_name = aws_cloudwatch_log_group.kurento_log_group.name
 }
 
-
-
-resource "aws_cloudwatch_log_stream" "kurento_log_stream_2" {
-  name           = "logs-kurento-worker-2"
+resource "aws_cloudwatch_log_stream" "coturn_log_streams" {
+  count          = var.nodes_count 
+  name           = "logs-coturn-for-kurento-worker-${count.index+1}"
   log_group_name = aws_cloudwatch_log_group.kurento_log_group.name
 }
-
-
-
-resource "aws_cloudwatch_log_stream" "coturn_log_stream_1" {
-  name           = "logs-coturn-for-kurento-worker-1"
-  log_group_name = aws_cloudwatch_log_group.kurento_log_group.name
-}
-
-
-
-resource "aws_cloudwatch_log_stream" "coturn_log_stream_2" {
-  name           = "logs-coturn-for-kurento-worker-2"
-  log_group_name = aws_cloudwatch_log_group.kurento_log_group.name
-}
-
-
 
 resource "aws_cloudwatch_log_group" "recsvc_log_group" {
   name              = "/recsvc-${var.tenant_id}-${var.infrastructure_purpose}/"
@@ -79,19 +63,12 @@ resource "aws_cloudwatch_log_group" "recsvc_log_group" {
   }
 }
 
-
-
-resource "aws_cloudwatch_log_stream" "recsvc_log_stream_processing_unit_1" {
-  name           = "logs-processing-worker-1"
+resource "aws_cloudwatch_log_stream" "recsvc_log_stream_processing_units" {
+  count          = var.nodes_count
+  name           = "logs-processing-worker-${count.index+1}"
   log_group_name = aws_cloudwatch_log_group.recsvc_log_group.name
 }
 
-
-
-resource "aws_cloudwatch_log_stream" "recsvc_log_stream_processing_unit_2" {
-  name           = "logs-processing-worker-2"
-  log_group_name = aws_cloudwatch_log_group.recsvc_log_group.name
-}
 
 
 /******* Specify log metrics ********/
