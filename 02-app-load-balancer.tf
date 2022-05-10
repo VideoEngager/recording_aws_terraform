@@ -31,23 +31,12 @@ resource "aws_lb_target_group" "kurento_target_group" {
 }
 
 
-
-resource "aws_lb_target_group_attachment" "kurento_target_group_attachment_1" {
+resource "aws_lb_target_group_attachment" "kurento_target_group_attachment" {
+  count            = var.nodes_count
   target_group_arn = aws_lb_target_group.kurento_target_group.arn
-  target_id        = aws_instance.kurento_worker_c1.id
+  target_id        = aws_instance.kurento_worker[count.index].id
   port             = 8888
 }
-
-
-
-resource "aws_lb_target_group_attachment" "kurento_target_group_attachment_2" {
-  target_group_arn = aws_lb_target_group.kurento_target_group.arn
-  target_id        = aws_instance.kurento_worker_c2.id
-  port             = 8888
-}
-
-
-
 
 
 resource "aws_lb" "recording_load_balancer" {
@@ -150,24 +139,12 @@ resource "aws_lb_target_group" "processing_target_group" {
   }
 }
 
-
-
-resource "aws_lb_target_group_attachment" "processing_target_group_attachment_1" {
+resource "aws_lb_target_group_attachment" "processing_target_group_attachment" {
+  count            = var.nodes_count
   target_group_arn = aws_lb_target_group.processing_target_group.arn
-  target_id        = aws_instance.processing_worker_1.id
+  target_id        = aws_instance.processing_worker[count.index].id
   port             = var.recording_service_listen_port
 }
-
-
-
-resource "aws_lb_target_group_attachment" "processing_target_group_attachment_2" {
-  target_group_arn = aws_lb_target_group.processing_target_group.arn
-  target_id        = aws_instance.processing_worker_2.id
-  port             = var.recording_service_listen_port
-}
-
-
-
 
 resource "aws_lb_listener" "processing_listener" {
   load_balancer_arn = aws_lb.recording_load_balancer.arn

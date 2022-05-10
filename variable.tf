@@ -168,3 +168,11 @@ variable "s3_bucket_force_destroy" {
   default = true
 }
 
+variable "nodes_count" {
+  default = 2
+  type = number
+  validation {
+    condition     = var.nodes_count < 50
+    error_message = "The value of nodes_count must be less than 50."
+  }
+}
