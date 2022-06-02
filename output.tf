@@ -16,9 +16,8 @@ output "efs" {
 
 
 output "vpc_peering_id" {
-  value       = aws_vpc_peering_connection.peer.id
+  value       = aws_vpc_peering_connection.peer.*.id
   description = "VPC Peering Connection Id"
-
 }
 
 output "efs_mount_ip_address_subnet1" {
@@ -33,4 +32,7 @@ output "efs_mount_ip_address_subnet2" {
 
 }
 
-    
+output "private_link_service_name" {
+  value       = aws_vpc_endpoint_service.private_link_service.*.service_name
+  description = "Private Link Service Name"
+}

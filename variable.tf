@@ -9,8 +9,12 @@ variable "kurento_monitoring_aws_secret_key" {
 }
 
 variable "deployment_region" {}
-variable "availability_zone_1" {}
-variable "availability_zone_2" {}
+variable "availability_zone_1" {
+  default = "a"
+}
+variable "availability_zone_2" {
+  default = "b"
+}
 
 variable "ec2_type" {}
 variable "pn_ec2_type" {}
@@ -175,4 +179,10 @@ variable "nodes_count" {
     condition     = var.nodes_count < 50
     error_message = "The value of nodes_count must be less than 50."
   }
+}
+
+variable "use_private_link" {
+  default = false
+  type = bool
+  description = "if true usage of AWS Private Link instead of VPC Peering"
 }
