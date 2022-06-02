@@ -206,7 +206,7 @@ resource "aws_security_group" "lb_sg" {
     to_port   = 7002
     protocol  = "tcp"
     cidr_blocks = [
-      var.controlling_vpc_cidr_block
+      var.use_private_link ? var.vpc_cidr_block : var.controlling_vpc_cidr_block
     ]
   }
 
@@ -216,7 +216,7 @@ resource "aws_security_group" "lb_sg" {
     to_port   = 8888
     protocol  = "tcp"
     cidr_blocks = [
-      var.controlling_vpc_cidr_block
+      var.use_private_link ? var.vpc_cidr_block : var.controlling_vpc_cidr_block
     ]
   }
 
