@@ -12,6 +12,9 @@ This repo will deploy recording infrastructure w/ elastic IP address for Kurento
 
 A high-level diagram is available [here](https://help.videoengager.com/hc/en-us/articles/360049346572-Recording-)
 
+![](img/rec3.png)
+
+
 A high-level diagrams for common AWS region PrivateLink scenario :
 
 ![](img/rec2.png)
