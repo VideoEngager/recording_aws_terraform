@@ -36,3 +36,8 @@ output "private_link_service_name" {
   value       = aws_vpc_endpoint_service.private_link_service.*.service_name
   description = "Private Link Service Name"
 }
+
+output "elastic_ips" {
+  value       = aws_eip.eip.*.public_ip
+  description = "Elastic IP adresses"
+}

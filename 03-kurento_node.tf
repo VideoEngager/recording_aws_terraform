@@ -51,6 +51,11 @@ data "template_file" "kurento_worker_init" {
   }
 }
 
+resource "aws_eip_association" "eip_assoc" {
+  count         = var.use_elastic_ip ? var.nodes_count : 0
+  instance_id   = aws_instance.kurento_worker[count.index].id
+  allocation_id = aws_eip.eip[count.index].id
+}
 
 
 resource "aws_instance" "kurento_worker" {

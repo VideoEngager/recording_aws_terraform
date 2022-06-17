@@ -186,3 +186,9 @@ variable "use_private_link" {
   type = bool
   description = "if true usage of AWS Private Link instead of VPC Peering"
 }
+
+variable "use_elastic_ip" {
+  default = false
+  type = bool
+  description = "if true usage of Elastic IP addresses of kurento nodes"
+}
