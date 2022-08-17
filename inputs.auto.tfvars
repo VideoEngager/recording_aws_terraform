@@ -6,6 +6,7 @@ deployment_region = ""
 
 ec2_type = "t3.small"
 pn_ec2_type = "t3.medium"
+docker_ec2_type = "t3.medium"
 
 vpc_cidr_block ="10.231.0.0/16"
 
@@ -13,6 +14,9 @@ nodes_count = 2
 
 use_private_link = false
 use_elastic_ip = true
+
+use_docker_workers = true
+aws_ecr_docker_token = ""
 
 #steps:
 # 1. Fill variables

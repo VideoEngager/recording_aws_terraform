@@ -31,13 +31,6 @@ resource "aws_lb_target_group" "kurento_target_group" {
 }
 
 
-resource "aws_lb_target_group_attachment" "kurento_target_group_attachment" {
-  count            = var.nodes_count
-  target_group_arn = aws_lb_target_group.kurento_target_group.arn
-  target_id        = aws_instance.kurento_worker[count.index].id
-  port             = 8888
-}
-
 
 resource "aws_lb" "recording_load_balancer" {
   name               = "RecLB-${var.tenant_id}-${var.infrastructure_purpose}"
@@ -137,13 +130,6 @@ resource "aws_lb_target_group" "processing_target_group" {
     interval            = 30  
     matcher             = 200
   }
-}
-
-resource "aws_lb_target_group_attachment" "processing_target_group_attachment" {
-  count            = var.nodes_count
-  target_group_arn = aws_lb_target_group.processing_target_group.arn
-  target_id        = aws_instance.processing_worker[count.index].id
-  port             = var.recording_service_listen_port
 }
 
 resource "aws_lb_listener" "processing_listener" {
