@@ -192,3 +192,23 @@ variable "use_elastic_ip" {
   type = bool
   description = "if true usage of Elastic IP addresses of kurento nodes"
 }
+
+variable "use_docker_workers" {
+  default = false
+  type = bool
+  description = "if true usage of Docker instance nodes"
+}
+
+variable "aws_ecr_docker_token" {
+  default = ""
+  type = string
+  description = "Temporary token used for docker login to AWS ECR service"
+}
+
+variable "docker_worker_log_dir" {
+  default = "/var/log/videoengager"
+}
+
+variable "docker_ec2_type" {
+  default = "t3.medium"
+}
