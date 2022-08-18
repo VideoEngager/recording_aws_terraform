@@ -15,7 +15,7 @@ nodes_count = 2
 use_private_link = false
 use_elastic_ip = true
 
-use_docker_workers = true
+use_docker_workers = false
 aws_ecr_docker_token = ""
 
 #steps:

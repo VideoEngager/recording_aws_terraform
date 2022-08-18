@@ -9,6 +9,7 @@ This repo will deploy recording infrastructure w/ elastic IP address for Kurento
 * EFS, representing a storage element
 * VPC and VPC peering to VideoEngager's controlling and signalling infrastructure.
 * PrivateLink endpoint service to VideoEngager's controlling and signalling infrastructure.
+* Docker containers instead of separate EC2 instances scenario
 
 A high-level diagram is available [here](https://help.videoengager.com/hc/en-us/articles/360049346572-Recording-)
 
@@ -25,6 +26,10 @@ A high-level diagrams for separate AWS region PrivateLink scenario :
 ![](img/rec1.png)
 
 
+A high-level diagrams for Docker workers usage scenario :
+
+![](img/rec4.jpg)
+
 
 Both, Kurento and Processing workers are EC2 containers that are initialized from AMIs, baked by VideoEngager. For more information about these AMIs, one can refer to the [following repository](https://github.com/VideoEngager/recording-golden-amis)
 
@@ -36,7 +41,15 @@ Both, Kurento and Processing workers are EC2 containers that are initialized fro
 2. Open ```inputs.auto.tfvars``` file and fill parameters
     > By default comunication with Videoengager VPC is by VPC peering. If you want to use AWS PrivateLink , set variable ```use_private_link = true```
 
-    > If need to save state in [terraform cloud](https://cloud.hashicorp.com/products/terraform) please rename file ```remote-state.tf.disabled``` to ```remote-state.tf``` and fill your *organization* and *workspace* fields. 
+    ##
+    
+    > For Docker workers scenario set these variables :
+    >> *  ```use_docker_workers = true```
+    >> *  ```aws_ecr_docker_token = "<token>"``` : This token is provided by Videoengager and is valid 12 hours! 
+
+   ##
+
+     > If need to save state in [terraform cloud](https://cloud.hashicorp.com/products/terraform) please rename file ```remote-state.tf.disabled``` to ```remote-state.tf``` and fill your *organization* and *workspace* fields. 
     
     > Next step is to login in terraform cloud with command
     ```bash
