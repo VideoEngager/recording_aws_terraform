@@ -18,7 +18,9 @@ variable "availability_zone_2" {
 
 variable "ec2_type" {}
 variable "pn_ec2_type" {}
-
+variable "play_ec2_type" {
+  default = "t3.small"
+}
 
 variable "tenant_id" {
   default = "customer"
@@ -124,6 +126,9 @@ variable "coturn_alt_listener_port" {
   default = 55000
 }
 
+variable "play_listener_port" {
+  default = 9001
+}
 
 variable "vpc_cidr_block" {}
 variable "cidr_block_recording_gateway" {
@@ -211,4 +216,10 @@ variable "docker_worker_log_dir" {
 
 variable "docker_ec2_type" {
   default = "t3.medium"
+}
+
+variable "use_play_service" {
+  default = false
+  type = bool
+  description = "if true add play service insance/s"
 }

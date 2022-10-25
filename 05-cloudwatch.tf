@@ -63,10 +63,25 @@ resource "aws_cloudwatch_log_group" "recsvc_log_group" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "playsvc_log_group" {
+  name              = "/playsvc-${var.tenant_id}-${var.infrastructure_purpose}/"
+  retention_in_days = 30
+  tags = {
+    Environment = var.infrastructure_purpose
+    Application = "PlayWorkers-${var.tenant_id}-${var.infrastructure_purpose}"
+  }
+}
+
 resource "aws_cloudwatch_log_stream" "recsvc_log_stream_processing_units" {
   count          = var.nodes_count
   name           = "logs-processing-worker-${count.index+1}"
   log_group_name = aws_cloudwatch_log_group.recsvc_log_group.name
+}
+
+resource "aws_cloudwatch_log_stream" "playsvc_log_stream_processing_units" {
+  count          = var.nodes_count
+  name           = "logs-play-worker-${count.index+1}"
+  log_group_name = aws_cloudwatch_log_group.playsvc_log_group.name
 }
 
 

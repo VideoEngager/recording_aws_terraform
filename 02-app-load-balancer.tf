@@ -165,6 +165,66 @@ resource "aws_lb_listener_rule" "processing_rule" {
   }
 }
 
+resource "aws_lb_target_group" "play_target_group" {
+  name     = "playtg-${var.tenant_id}-${var.infrastructure_purpose}"
+  port     = var.play_listener_port
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.recording_vpc.id
+
+
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes        = [name]
+  }
+
+
+  stickiness {
+    type            = "lb_cookie"
+    cookie_duration = 86400
+    enabled         = true
+  }
+
+  health_check {
+    enabled             = "true"
+    protocol            = "HTTP"
+    path                = "/play/health"
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+    interval            = 30  
+    matcher             = 200
+  }
+}
+
+resource "aws_lb_listener" "play_listener" {
+  load_balancer_arn = aws_lb.recording_load_balancer.arn
+  port              = var.play_listener_port
+
+  protocol = "HTTP"
+
+  default_action {
+    target_group_arn = aws_lb_target_group.play_target_group.arn
+    type             = "forward"
+  }
+}
+
+
+
+resource "aws_lb_listener_rule" "play_rule" {
+  listener_arn = aws_lb_listener.play_listener.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.play_target_group.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/"]
+    }
+  }
+}
 
 
 
