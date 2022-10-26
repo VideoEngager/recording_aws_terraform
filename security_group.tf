@@ -105,15 +105,11 @@ resource "aws_security_group" "play_worker_sg" {
     create_before_destroy = true
   }
 
-
   ingress {
     from_port = var.play_listener_port
     to_port   = var.play_listener_port
     protocol  = "tcp"
-    cidr_blocks = [
-      local.cidr_block_subnet_public_1,
-      local.cidr_block_subnet_public_2
-    ]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
