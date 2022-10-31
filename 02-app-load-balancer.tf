@@ -34,7 +34,7 @@ resource "aws_lb_target_group" "kurento_target_group" {
 
 resource "aws_lb" "recording_load_balancer" {
   name               = "RecLB-${var.tenant_id}-${var.infrastructure_purpose}"
-  internal           = true
+  internal           = false
   load_balancer_type = "application"
   subnets = [
     aws_subnet.main-public-1.id,

@@ -109,7 +109,10 @@ resource "aws_security_group" "play_worker_sg" {
     from_port = var.play_listener_port
     to_port   = var.play_listener_port
     protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [
+      local.cidr_block_subnet_public_1,
+      local.cidr_block_subnet_public_2
+    ]
   }
 
   egress {
@@ -251,6 +254,12 @@ resource "aws_security_group" "lb_sg" {
     ]
   }
 
+  ingress {
+    from_port = var.play_listener_port
+    to_port   = var.play_listener_port
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
 
   egress {
