@@ -220,10 +220,6 @@ resource "aws_security_group" "kurento_worker_sg" {
 }
 
 
-
-
-
-
 resource "aws_security_group" "lb_sg" {
   vpc_id      = aws_vpc.recording_vpc.id
   name        = "ELB-SG-${var.tenant_id}-${var.infrastructure_purpose}"
@@ -271,6 +267,38 @@ resource "aws_security_group" "lb_sg" {
 
   tags = {
     Name = "ELB-SG-${var.tenant_id}-${var.infrastructure_purpose}"
+  }
+
+}
+
+resource "aws_security_group" "play_lb_sg" {
+  vpc_id      = aws_vpc.recording_vpc.id
+  name        = "PlayELB-SG-${var.tenant_id}-${var.infrastructure_purpose}"
+  description = "Allow access through ports 443 and 9001"
+
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+
+  ingress {
+    from_port = var.play_listener_port
+    to_port   = var.play_listener_port
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "PlayELB-SG-${var.tenant_id}-${var.infrastructure_purpose}"
   }
 
 }

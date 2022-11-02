@@ -41,3 +41,8 @@ output "elastic_ips" {
   value       = aws_eip.eip.*.public_ip
   description = "Elastic IP adresses"
 }
+
+output "play_app_gateway_url" {
+  value       = aws_apigatewayv2_api.play_gateway.*.api_endpoint
+  description = "The dns name of play service load balancer."
+}

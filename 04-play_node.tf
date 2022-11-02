@@ -79,7 +79,7 @@ resource "aws_instance" "play_worker" {
 
 resource "aws_lb_target_group_attachment" "play_target_group_attachment" {
   count            = (var.use_docker_workers && !var.use_play_service) ? 0 : var.nodes_count
-  target_group_arn = aws_lb_target_group.play_target_group.arn
+  target_group_arn = aws_lb_target_group.play_target_group[0].arn
   target_id        = aws_instance.play_worker[count.index].id
   port             = var.play_listener_port
 }

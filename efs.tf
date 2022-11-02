@@ -11,6 +11,13 @@ resource "aws_efs_file_system" "recording-efs" {
   tags = {
     Name = "RecordingElasticStorage-${var.tenant_id}-${var.infrastructure_purpose}"
   }
+
+    lifecycle {
+    ignore_changes = [
+      creation_token,
+      tags,
+    ]
+  }
 }
 
 
