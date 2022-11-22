@@ -47,10 +47,15 @@ resource "aws_instance" "play_worker" {
   instance_type        = var.play_ec2_type
   subnet_id            = (count.index % 2 == 0 ? aws_subnet.main-public-1.id : aws_subnet.main-public-2.id)
   iam_instance_profile = aws_iam_instance_profile.CloudWatch_Profile.name
+  private_ip           = local.play_nodes_private_ips[count.index]
   user_data            = data.template_file.play_worker_init[count.index].rendered
 
   monitoring    = true
   ebs_optimized = true
+
+  root_block_device {
+    volume_size = 16
+  }
 
   # EC2 instances should disable IMDS or require IMDSv2 as this can be related to the weaponization phase of kill chain
   metadata_options {

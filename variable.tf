@@ -223,3 +223,9 @@ variable "use_play_service" {
   type = bool
   description = "if true add play service insance/s"
 }
+
+variable "play_service_cert_arn" {
+  default = ""
+  type = string
+  description = "If in use .. add https support for play load balancer otherwise uses http"
+}
