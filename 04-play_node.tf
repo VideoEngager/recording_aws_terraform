@@ -18,7 +18,7 @@ locals {
 
 
 data "template_file" "play_worker_init" {
-  count = (var.use_docker_workers && !var.use_play_service) ? 0 : var.nodes_count
+  count = (var.use_docker_workers || !var.use_play_service) ? 0 : var.nodes_count
   template = file("./config/play-worker-init.tpl")
 
   vars = {
@@ -42,7 +42,7 @@ data "template_file" "play_worker_init" {
 
 
 resource "aws_instance" "play_worker" {
-  count                = (var.use_docker_workers && !var.use_play_service) ? 0 : var.nodes_count
+  count                = (var.use_docker_workers || !var.use_play_service) ? 0 : var.nodes_count
   ami                  = data.aws_ami.play_worker_ami.id
   instance_type        = var.play_ec2_type
   subnet_id            = (count.index % 2 == 0 ? aws_subnet.main-public-1.id : aws_subnet.main-public-2.id)
@@ -83,7 +83,7 @@ resource "aws_instance" "play_worker" {
 }
 
 resource "aws_lb_target_group_attachment" "play_target_group_attachment" {
-  count            = (var.use_docker_workers && !var.use_play_service) ? 0 : var.nodes_count
+  count            = (var.use_docker_workers || !var.use_play_service) ? 0 : var.nodes_count
   target_group_arn = aws_lb_target_group.play_target_group[0].arn
   target_id        = aws_instance.play_worker[count.index].id
   port             = var.play_listener_port

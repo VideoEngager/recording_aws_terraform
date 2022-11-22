@@ -3,7 +3,7 @@ locals {
 }
 
 resource "aws_lb" "play_load_balancer" {
-  count              = (var.use_docker_workers && !var.use_play_service) ? 0 : 1
+  count              = (var.use_docker_workers || !var.use_play_service) ? 0 : 1
   name               = "RecPlay-${var.tenant_id}-${var.infrastructure_purpose}"
   internal           = false
   load_balancer_type = "application"
@@ -32,7 +32,7 @@ resource "aws_lb" "play_load_balancer" {
 }
 
 resource "aws_lb_target_group" "play_target_group" {
-  count    = (var.use_docker_workers && !var.use_play_service) ? 0 : 1
+  count    = (var.use_docker_workers || !var.use_play_service) ? 0 : 1
   name     = "playtg-${var.tenant_id}-${var.infrastructure_purpose}"
   port     = var.play_listener_port
   protocol = "HTTP"
@@ -64,7 +64,7 @@ resource "aws_lb_target_group" "play_target_group" {
 }
 
 resource "aws_lb_listener" "play_listener" {
-  count             = (var.use_docker_workers && !var.use_play_service) ? 0 : 1
+  count             = (var.use_docker_workers || !var.use_play_service) ? 0 : 1
   load_balancer_arn = aws_lb.play_load_balancer[0].arn
   port              = local.play_https ? 443 : var.play_listener_port
 
@@ -79,13 +79,13 @@ resource "aws_lb_listener" "play_listener" {
 }
 
 resource "aws_lb_listener_certificate" "lb_play_certificate" {
-  count = (var.use_docker_workers && !var.use_play_service && !local.play_https) ? 0 : 1
+  count = (var.use_docker_workers || !var.use_play_service || !local.play_https) ? 0 : 1
   listener_arn    = aws_lb_listener.play_listener[0].arn
   certificate_arn = var.play_service_cert_arn
 }
 
 resource "aws_lb_listener_rule" "play_rule" {
-  count        = (var.use_docker_workers && !var.use_play_service) ? 0 : 1
+  count        = (var.use_docker_workers || !var.use_play_service) ? 0 : 1
   listener_arn = aws_lb_listener.play_listener[0].arn
   priority     = 100
 
