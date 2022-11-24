@@ -2,7 +2,7 @@
 
 sleep 30
 
-#because of a bug in AWS (random powerkey press), we prevent powerkey pressing
+#prevent lambda rebooting during setup
 echo "HandlePowerKey=ignore" >> /etc/systemd/logind.conf
 systemctl restart systemd-logind
 
