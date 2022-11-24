@@ -1,6 +1,11 @@
 #!/bin/bash
 
 sleep 30
+
+#because of a bug in AWS (random powerkey press), we prevent powerkey pressing
+echo "HandlePowerKey=ignore" >> /etc/systemd/logind.conf
+systemctl restart systemd-logind
+
 yum updateinfo -y
 yum install bind-utils -y
 
@@ -94,6 +99,10 @@ docker login -u AWS 376474804475.dkr.ecr.eu-west-1.amazonaws.com -p ${docker_tok
 
 echo "$(date) docker-compose up"
 docker-compose -f /tmp/docker-compose.yml up -d
+
+#restore power button actions
+sed -i '/HandlePowerKey=ignore/d' /etc/systemd/logind.conf
+systemctl restart systemd-logind
 
 echo "$(date) Done!"
 
