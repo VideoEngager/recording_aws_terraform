@@ -1,5 +1,6 @@
 locals {  
   docker_instance_names = [for a in range(var.nodes_count):"Rec-DockerWorker-${a+1}-${var.tenant_id}-${var.infrastructure_purpose}"]
+  reporter_docker_play_url = "${lookup(var.reporter_host, var.infrastructure_purpose)}"
 }
 
 
@@ -19,10 +20,12 @@ data "aws_ami" "worker_ami_centos" {
 
 data "template_file" "docker_worker_init" {
   count = var.nodes_count
-  template = file("./config/deocker-centos7-worker-init.tpl")
+  template = file("./config/docker-centos7-worker-init.tpl")
   vars = {
+    playback_base_url        = local.reporter_docker_play_url
 
-    coturn_listener_port     = var.coturn_listener_port    
+    coturn_listener_port     = var.coturn_listener_port
+    play_listener_port       = var.play_listener_port    
     internal_ip              = local.kurento_nodes_private_ips[count.index]
     turn_server_username     = random_string.random_username.result
     turn_server_password     = random_password.password.result

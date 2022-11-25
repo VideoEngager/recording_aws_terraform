@@ -95,6 +95,40 @@ resource "aws_security_group" "processing_worker_sg" {
 }
 
 
+resource "aws_security_group" "play_worker_sg" {
+  vpc_id      = aws_vpc.recording_vpc.id
+  name        = "PLAY-WORK-SG-${var.tenant_id}-${var.infrastructure_purpose}"
+  description = "Allow playback service port"
+
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  ingress {
+    from_port = var.play_listener_port
+    to_port   = var.play_listener_port
+    protocol  = "tcp"
+    cidr_blocks = [
+      local.cidr_block_subnet_public_1,
+      local.cidr_block_subnet_public_2
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "PLAY-WORK-SG-${var.tenant_id}-${var.infrastructure_purpose}"
+    Environment = var.infrastructure_purpose
+  }
+
+}
+
 
 
 
@@ -186,10 +220,6 @@ resource "aws_security_group" "kurento_worker_sg" {
 }
 
 
-
-
-
-
 resource "aws_security_group" "lb_sg" {
   vpc_id      = aws_vpc.recording_vpc.id
   name        = "ELB-SG-${var.tenant_id}-${var.infrastructure_purpose}"
@@ -220,6 +250,12 @@ resource "aws_security_group" "lb_sg" {
     ]
   }
 
+  ingress {
+    from_port = var.play_listener_port
+    to_port   = var.play_listener_port
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
 
   egress {
@@ -231,6 +267,45 @@ resource "aws_security_group" "lb_sg" {
 
   tags = {
     Name = "ELB-SG-${var.tenant_id}-${var.infrastructure_purpose}"
+  }
+
+}
+
+resource "aws_security_group" "play_lb_sg" {
+  vpc_id      = aws_vpc.recording_vpc.id
+  name        = "PlayELB-SG-${var.tenant_id}-${var.infrastructure_purpose}"
+  description = "Allow access through ports 443 and 9001"
+
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+
+  ingress {
+    from_port = var.play_listener_port
+    to_port   = var.play_listener_port
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "PlayELB-SG-${var.tenant_id}-${var.infrastructure_purpose}"
   }
 
 }

@@ -12,6 +12,10 @@ vpc_cidr_block ="10.231.0.0/16"
 
 nodes_count = 2
 
+use_play_service = false
+play_ec2_type = "t3.small"
+play_service_cert_arn=""
+
 use_private_link = false
 use_elastic_ip = true
 

@@ -41,3 +41,13 @@ output "elastic_ips" {
   value       = aws_eip.eip.*.public_ip
   description = "Elastic IP adresses"
 }
+
+output "play_service_url" {
+  value       = aws_lb.play_load_balancer.*.dns_name
+  description = "The dns name of play service load balancer."
+}
+
+output "play_service_url_hosted_zone" {
+  value       = aws_lb.play_load_balancer.*.zone_id
+  description = "The hosted zone of play service load balancer."
+}

@@ -53,6 +53,7 @@ resource "aws_instance" "processing_worker" {
   instance_type        = var.pn_ec2_type
   subnet_id            = (count.index % 2 == 0 ? aws_subnet.main-public-1.id : aws_subnet.main-public-2.id)
   iam_instance_profile = aws_iam_instance_profile.CloudWatch_Profile.name
+  private_ip           = local.processing_nodes_private_ips[count.index]
   user_data            = data.template_file.processing_worker_init[count.index].rendered
 
   monitoring    = true
@@ -62,6 +63,10 @@ resource "aws_instance" "processing_worker" {
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
+  }
+
+  root_block_device {
+    volume_size = 16
   }
 
   vpc_security_group_ids = [
