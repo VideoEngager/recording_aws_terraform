@@ -82,3 +82,45 @@ terraform plan
 ```bash
 terraform apply -auto-approve
 ```
+
+## Update procedure
+
+When you need to update your recording infrastructure do following :
+
+1. Be sure that the state of you infrastructure is available : 
+   
+   * In case you are using terraform.tfstate file : File should be in the root script directory
+
+   * In case you are using terraform cloud : 
+
+     * Check login with : 
+      ```bash
+      terraform login
+      ```
+       
+     * Reinit state with :
+      ```bash
+      terraform init -reconfigure
+      ```
+
+2. Run Update commands :
+  
+  * In case you are using EC2 containers : 
+  ```bash
+  terraform plan
+  terraform apply
+  ```
+  * In case you are using Docker containers :
+    * Check value of `nodes_count` variable located in `inputs.auto.tfvars` and execute following :
+      * In case nodes_count=2 
+      ```bash
+      terraform plan -replace=aws_instance.docker_worker[0] -replace=aws_instance.docker_worker[1]
+      terraform apply -replace=aws_instance.docker_worker[0] -replace=aws_instance.docker_worker[1]
+      ```
+      * In case nodes_count=3 
+      ```bash
+      terraform plan -replace=aws_instance.docker_worker[0] -replace=aws_instance.docker_worker[1] -replace=aws_instance.docker_worker[2]
+      terraform apply -replace=aws_instance.docker_worker[0] -replace=aws_instance.docker_worker[1] -replace=aws_instance.docker_worker[2]
+      ```
+    
+    Or just append needed `-replace aws_instance.docker_worker[?]` block to the terraform plan/apply 
