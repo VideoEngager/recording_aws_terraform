@@ -48,6 +48,19 @@ services:
        - ${log_dir}/:/var/log/kurento-media-server/
        - ${media_output_dir}/:/rec
 
+  play:
+    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-play:latest
+    environment: 
+      - PLAYBACK_BASE_URL=${playback_base_url}
+      - PLAYSVC_LISTEN_PORT=${play_listener_port}
+    restart: always
+    tty: true
+    container_name: play_worker
+    ports:
+      - ${play_listener_port}:${play_listener_port}
+    volumes:
+       - ${log_dir}/:/playsvc/log/
+       - ${media_output_dir}/:/rec
 
 
   processing_worker:

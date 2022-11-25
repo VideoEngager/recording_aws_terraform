@@ -70,6 +70,10 @@ resource "aws_instance" "kurento_worker" {
   monitoring    = true
   ebs_optimized = true
 
+  root_block_device {
+    volume_size = 16
+  }
+
   # EC2 instances should disable IMDS or require IMDSv2 as this can be related to the weaponization phase of kill chain
   metadata_options {
     http_endpoint = "enabled"

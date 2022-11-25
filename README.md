@@ -47,6 +47,13 @@ Both, Kurento and Processing workers are EC2 containers that are initialized fro
     >> *  ```use_docker_workers = true```
     >> *  ```aws_ecr_docker_token = "<token>"``` : This token is provided by Videoengager and is valid 12 hours! 
 
+    ##
+    
+    > For Play availability :
+    >> *  ```use_play_service = true```
+    >> *  ```play_ec2_type = "t3.small"```
+    >> *  ```play_service_cert_arn = "<aws public certificate ARN>"``` : This is useable if we want to use our custom subdomain with https for recordings playback
+
    ##
 
      > If need to save state in [terraform cloud](https://cloud.hashicorp.com/products/terraform) please rename file ```remote-state.tf.disabled``` to ```remote-state.tf``` and fill your *organization* and *workspace* fields. 
