@@ -229,3 +229,9 @@ variable "play_service_cert_arn" {
   type = string
   description = "If in use .. add https support for play load balancer otherwise uses http"
 }
+
+variable "custom_efs_address"{
+  default = ""
+  type = string
+  description = "If in use .. do not create efs .. use provided in value one"
+}

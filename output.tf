@@ -9,9 +9,8 @@ output "load_balancer_dns" {
 
 
 output "efs" {
-  value       = aws_efs_file_system.recording-efs.dns_name
+  value       = local.create_efs ? aws_efs_file_system.recording-efs[0].dns_name : var.custom_efs_address
   description = "The efs info."
-
 }
 
 

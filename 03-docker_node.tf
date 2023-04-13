@@ -30,7 +30,7 @@ data "template_file" "docker_worker_init" {
     turn_server_username     = random_string.random_username.result
     turn_server_password     = random_password.password.result
 
-    efs_dns_name     = aws_efs_file_system.recording-efs.dns_name
+    efs_dns_name     = local.create_efs ? aws_efs_file_system.recording-efs[0].dns_name : var.custom_efs_address
     media_output_dir = var.media_output_dir
 
     docker_token     = var.aws_ecr_docker_token 
