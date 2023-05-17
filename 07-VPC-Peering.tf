@@ -11,6 +11,11 @@ resource "aws_vpc_peering_connection" "peer" {
     Name = "Customer Recording VPC Peering with main"
     Side = "Requester"
   }
+
+  # lifecycle {
+  #   ignore_changes        = [tags,peer_region,peer_vpc_id,vpc_id]
+  # }
+
 }
 
 

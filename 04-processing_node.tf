@@ -18,7 +18,7 @@ locals {
 
 
 data "template_file" "processing_worker_init" {
-  count = var.nodes_count
+  count = local.processing_nodes
   template = file("./config/processing-worker-init.tpl")
 
   vars = {
@@ -48,7 +48,7 @@ data "template_file" "processing_worker_init" {
 
 
 resource "aws_instance" "processing_worker" {
-  count                = var.use_docker_workers ? 0 : var.nodes_count
+  count                = var.use_docker_workers ? 0 : local.processing_nodes
   ami                  = data.aws_ami.processing_worker_ami.id
   instance_type        = var.pn_ec2_type
   subnet_id            = (count.index % 2 == 0 ? aws_subnet.main-public-1.id : aws_subnet.main-public-2.id)
@@ -89,7 +89,7 @@ resource "aws_instance" "processing_worker" {
 }
 
 resource "aws_lb_target_group_attachment" "processing_target_group_attachment" {
-  count            = var.use_docker_workers ? 0 : var.nodes_count
+  count            = var.use_docker_workers ? 0 : local.processing_nodes
   target_group_arn = aws_lb_target_group.processing_target_group.arn
   target_id        = aws_instance.processing_worker[count.index].id
   port             = var.recording_service_listen_port

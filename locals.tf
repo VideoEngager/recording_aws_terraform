@@ -1,12 +1,15 @@
 locals {
+  kurento_nodes = var.kurento_nodes_count * 2
+  processing_nodes = var.processing_nodes_count * 2
+  play_nodes = var.play_nodes_count * 2
   cidr_block_subnet_public_1 =  cidrsubnet(var.vpc_cidr_block, 8, 1)
   cidr_block_subnet_public_2 =  cidrsubnet(var.vpc_cidr_block, 8, 2)
   cidr_block_subnet_private_1 = cidrsubnet(var.vpc_cidr_block, 8, 3)
   cidr_block_subnet_private_2 = cidrsubnet(var.vpc_cidr_block, 8, 4)
   efs_mount_ip_address_subnet1 = cidrhost(var.vpc_cidr_block, 1*256+100) //1.5
   efs_mount_ip_address_subnet2 = cidrhost(var.vpc_cidr_block, 2*256+100) //2.5
-  kurento_nodes_private_ips = [for a in range(var.nodes_count):cidrhost(var.vpc_cidr_block, (a%2==0?1:2)*256+10+a)]
-  processing_nodes_private_ips = [for a in range(var.nodes_count):cidrhost(var.vpc_cidr_block, (a%2==0?1:2)*256+101+a)]
-  play_nodes_private_ips = [for a in range(var.nodes_count):cidrhost(var.vpc_cidr_block, (a%2==0?1:2)*256+200+a)]
+  kurento_nodes_private_ips = [for a in range(local.kurento_nodes):cidrhost(var.vpc_cidr_block, (a%2==0?1:2)*256+10+a)]
+  processing_nodes_private_ips = [for a in range(local.processing_nodes):cidrhost(var.vpc_cidr_block, (a%2==0?1:2)*256+101+a)]
+  play_nodes_private_ips = [for a in range(local.play_nodes):cidrhost(var.vpc_cidr_block, (a%2==0?1:2)*256+200+a)]
   create_efs = var.custom_efs_address == null || length(var.custom_efs_address)==0
 }

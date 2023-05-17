@@ -177,15 +177,6 @@ variable "s3_bucket_force_destroy" {
   default = true
 }
 
-variable "nodes_count" {
-  default = 2
-  type = number
-  validation {
-    condition     = var.nodes_count < 50
-    error_message = "The value of nodes_count must be less than 50."
-  }
-}
-
 variable "use_private_link" {
   default = false
   type = bool
@@ -234,4 +225,31 @@ variable "custom_efs_address"{
   default = ""
   type = string
   description = "If in use .. do not create efs .. use provided in value one"
+}
+
+variable "kurento_nodes_count" {
+  default = 1
+  type = number
+  validation {
+    condition     = var.kurento_nodes_count < 20
+    error_message = "The value of kurento_nodes_count must be less than 20."
+  }
+}
+
+variable "processing_nodes_count" {
+  default = 1
+  type = number
+  validation {
+    condition     = var.processing_nodes_count < 20
+    error_message = "The value of processing_nodes_count must be less than 20."
+  }
+}
+
+variable "play_nodes_count" {
+  default = 1
+  type = number
+  validation {
+    condition     = var.play_nodes_count < 20
+    error_message = "The value of play_nodes_count must be less than 20."
+  }
 }

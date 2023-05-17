@@ -1,5 +1,5 @@
 locals {  
-  kurento_instance_names = [for a in range(var.nodes_count):"KurentoWorker-${a+1}-${var.tenant_id}-${var.infrastructure_purpose}"]
+  kurento_instance_names = [for a in range(local.kurento_nodes):"KurentoWorker-${a+1}-${var.tenant_id}-${var.infrastructure_purpose}"]
 }
 
 
@@ -18,7 +18,7 @@ data "aws_ami" "kurento_worker_ami" {
 
 
 data "template_file" "kurento_worker_init" {
-  count = var.nodes_count
+  count = local.kurento_nodes
   template = file("./config/kurento-worker-init.tpl")
   vars = {
     kurento_service_log_file_path = "/var/log/kurento-media-server/*.log"
@@ -52,14 +52,14 @@ data "template_file" "kurento_worker_init" {
 }
 
 resource "aws_eip_association" "eip_assoc" {
-  count         = (var.use_elastic_ip && !var.use_docker_workers) ? var.nodes_count : 0
+  count         = (var.use_elastic_ip && !var.use_docker_workers) ? local.kurento_nodes : 0
   instance_id   = aws_instance.kurento_worker[count.index].id
   allocation_id = aws_eip.eip[count.index].id
 }
 
 
 resource "aws_instance" "kurento_worker" {
-  count                = var.use_docker_workers ? 0 : var.nodes_count
+  count                = var.use_docker_workers ? 0 : local.kurento_nodes
   ami                  = data.aws_ami.kurento_worker_ami.id
   instance_type        = var.ec2_type
   subnet_id            = (count.index % 2 == 0 ? aws_subnet.main-public-1.id : aws_subnet.main-public-2.id )
@@ -100,7 +100,7 @@ resource "aws_instance" "kurento_worker" {
 }
 
 resource "aws_lb_target_group_attachment" "kurento_target_group_attachment" {
-  count            = var.use_docker_workers ? 0 : var.nodes_count
+  count            = var.use_docker_workers ? 0 : local.kurento_nodes
   target_group_arn = aws_lb_target_group.kurento_target_group.arn
   target_id        = aws_instance.kurento_worker[count.index].id
   port             = 8888
