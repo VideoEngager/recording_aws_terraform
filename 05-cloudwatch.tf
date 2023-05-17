@@ -41,13 +41,13 @@ resource "aws_cloudwatch_log_group" "kurento_log_group" {
 
 
 resource "aws_cloudwatch_log_stream" "kurento_log_streams" {
-  count          = var.nodes_count 
+  count          = local.kurento_nodes
   name           = "logs-kurento-worker-${count.index+1}"
   log_group_name = aws_cloudwatch_log_group.kurento_log_group.name
 }
 
 resource "aws_cloudwatch_log_stream" "coturn_log_streams" {
-  count          = var.nodes_count 
+  count          = local.kurento_nodes 
   name           = "logs-coturn-for-kurento-worker-${count.index+1}"
   log_group_name = aws_cloudwatch_log_group.kurento_log_group.name
 }
@@ -73,13 +73,13 @@ resource "aws_cloudwatch_log_group" "playsvc_log_group" {
 }
 
 resource "aws_cloudwatch_log_stream" "recsvc_log_stream_processing_units" {
-  count          = var.nodes_count
+  count          = local.processing_nodes
   name           = "logs-processing-worker-${count.index+1}"
   log_group_name = aws_cloudwatch_log_group.recsvc_log_group.name
 }
 
 resource "aws_cloudwatch_log_stream" "playsvc_log_stream_processing_units" {
-  count          = var.nodes_count
+  count          = local.play_nodes
   name           = "logs-play-worker-${count.index+1}"
   log_group_name = aws_cloudwatch_log_group.playsvc_log_group.name
 }

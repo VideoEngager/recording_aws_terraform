@@ -71,7 +71,7 @@ resource "aws_lambda_function" "lambda_reboot_instance_on_sns_alarm" {
   handler       = "RebootInstanceOnSNSAlarm::RebootInstanceOnSNSAlarm.Function::FunctionHandler"
 
   source_code_hash = filebase64sha256("./lambda_zip/RebootInstanceOnSNSAlarm.zip")
-  runtime          = "dotnetcore3.1"
+  runtime          = "dotnet6"
   publish          = true
 
   memory_size = 256
