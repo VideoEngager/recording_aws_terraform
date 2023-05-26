@@ -49,7 +49,15 @@ Both, Kurento and Processing workers are EC2 containers that are initialized fro
 
     ##
     
+    > For Custom Kurento and/or Processing nodes count. With these variables you can setup instance count of the services. 
+    Value 1 means 2 instances, 2 means 4 instances and etc..
+    >> *  ```kurento_nodes_count = 1```
+    >> *  ```processing_nodes_count = 1```
+    
+    ##
+    
     > For Play availability :
+    >> *  ```play_nodes_count = 1``` : Here you can setup instance count of the service.Value 1 means 2 instances, 2 means 4 instances and etc..
     >> *  ```use_play_service = true```
     >> *  ```play_ec2_type = "t3.small"```
     >> *  ```play_service_cert_arn = "<aws public certificate ARN>"``` : This is useable if we want to use our custom subdomain with https for recordings playback
