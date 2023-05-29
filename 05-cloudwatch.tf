@@ -47,7 +47,7 @@ resource "aws_cloudwatch_log_stream" "kurento_log_streams" {
 }
 
 resource "aws_cloudwatch_log_stream" "coturn_log_streams" {
-  count          = local.kurento_nodes 
+  count          = local.use_turn_nodes ? local.turn_nodes : local.kurento_nodes 
   name           = "logs-coturn-for-kurento-worker-${count.index+1}"
   log_group_name = aws_cloudwatch_log_group.kurento_log_group.name
 }
