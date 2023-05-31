@@ -44,7 +44,12 @@ variable "tenant_id" {
   type    = string
 }
 
-variable "media_output_dir" {
+variable "media_input_mount_dir" {
+  default = "/rec"
+  type    = string
+}
+
+variable "media_output_mount_dir" {
   default = "/rec"
   type    = string
 }
@@ -304,4 +309,10 @@ variable "use_separate_turn_service" {
 
 variable "turn_ec2_type" {
   default = "t3.small"
+}
+
+variable "remote_efs_address" {
+  default = null
+  type = string
+  description = "if not null app uses this filesystem to store final recording files.Please note that you must use different values for media_input_mount_dir and media_output_mount_dir "
 }

@@ -30,8 +30,8 @@ data "template_file" "play_worker_init" {
     log_stream_name       = aws_cloudwatch_log_stream.playsvc_log_stream_processing_units[count.index].name
 
 
-    efs_dns_name         = local.create_efs ? aws_efs_file_system.recording-efs[0].dns_name : var.custom_efs_address
-    media_output_dir     = var.media_output_dir
+    efs_dns_name         = local.remote_efs_validation && var.remote_efs_address!=null ? var.remote_efs_address : local.efs_dns_name
+    media_output_dir     = var.media_output_mount_dir
     media_mixer_dir      = var.media_mixer_dir
     media_file_ready_dir = var.media_file_ready_dir
   }

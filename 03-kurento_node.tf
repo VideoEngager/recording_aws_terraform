@@ -47,7 +47,7 @@ data "template_file" "kurento_worker_init" {
 
 
     efs_dns_name     = local.create_efs ? aws_efs_file_system.recording-efs[0].dns_name : var.custom_efs_address
-    media_output_dir = var.media_output_dir
+    media_output_dir = var.media_input_mount_dir
 
   }
 }

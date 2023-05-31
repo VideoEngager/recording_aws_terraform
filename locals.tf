@@ -14,4 +14,7 @@ locals {
   turn_nodes_private_ips = [for a in range(local.turn_nodes):cidrhost(var.vpc_cidr_block, (a%2==0?1:2)*256+150+a)]
   play_nodes_private_ips = [for a in range(local.play_nodes):cidrhost(var.vpc_cidr_block, (a%2==0?1:2)*256+200+a)]
   create_efs = var.custom_efs_address == null || length(var.custom_efs_address)==0
+  efs_dns_name = local.create_efs ? aws_efs_file_system.recording-efs[0].dns_name : var.custom_efs_address
+
+  remote_efs_validation = var.remote_efs_address == null ? true : (var.media_input_mount_dir != var.media_output_mount_dir ? true : tobool("When you are using remote_efs_address -> media_input_mount_dir must be different from media_output_mount_dir"))
 }
