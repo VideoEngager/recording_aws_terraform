@@ -1,50 +1,78 @@
-variable "access_key" {}
-variable "secret_key" {}
+variable "access_key" {
+  type    = string
+}
+variable "secret_key" {
+  type    = string
+}
 
 variable "kurento_monitoring_aws_access_key" {
   default = ""
+  type    = string
 }
 variable "kurento_monitoring_aws_secret_key" {
   default = ""
+  type    = string
 }
 
-variable "deployment_region" {}
+variable "deployment_region" {
+  type    = string
+}
 variable "availability_zone_1" {
   default = "a"
+  type    = string
 }
 variable "availability_zone_2" {
   default = "b"
+  type    = string
 }
 
-variable "ec2_type" {}
-variable "pn_ec2_type" {}
+variable "ec2_type" {
+  default = "t3.medium"
+  type    = string
+}
+variable "pn_ec2_type" {
+  default = "t3.small"
+  type    = string
+}
 variable "play_ec2_type" {
   default = "t3.small"
+  type    = string
 }
 
 variable "tenant_id" {
   default = "customer"
+  type    = string
 }
 
-variable "media_output_dir" {
+variable "media_input_mount_dir" {
   default = "/rec"
+  type    = string
+}
+
+variable "media_output_mount_dir" {
+  default = "/rec"
+  type    = string
 }
 
 variable "media_mixer_dir" {
   default = "/outdir"
+  type    = string
 }
 
 variable "media_file_ready_dir" {
   default = "/s3"
+  type    = string
 }
 
 
 variable "infrastructure_purpose" {
   default = "prod"
+  type    = string
 }
 
 variable "isEFSEncrypted" {
-  default     = "true"
+  type    = bool
+  default     = true
   description = "Controls the encryption of data at rest. If true, the disk will be encrypted."
 }
 
@@ -105,12 +133,14 @@ variable "reporter_path" {
 
 
 variable "min_port" {
+  type    = number
   default     = 55002
   description = "Lower bound of the UDP port range for relay endpoints allocation."
 }
 
 
 variable "max_port" {
+  type    = number
   default     = 65535
   description = "Upper bound of the UDP port range for relay endpoints allocation."
 }
@@ -118,29 +148,37 @@ variable "max_port" {
 
 
 variable "coturn_listener_port" {
+  type    = number
   default = 3478
 }
 
 
 variable "coturn_alt_listener_port" {
+  type    = number
   default = 55000
 }
 
 variable "play_listener_port" {
+  type    = number
   default = 9001
 }
 
-variable "vpc_cidr_block" {}
+variable "vpc_cidr_block" {
+  type    = string
+}
 variable "cidr_block_recording_gateway" {
+  type    = string
   default = "0.0.0.0/0"
 }
 
 variable "csi_vpc_id" {
+  type    = string
   default = "vpc-0f1ceef6cafda43b9"
 }
 
 
 variable "controlling_vpc_cidr_block" {
+  type    = string
   default     = "10.77.0.0/16"
   description = "VPC CIRD for SmartVideo Controlling Infrastructure"
 }
@@ -148,6 +186,7 @@ variable "controlling_vpc_cidr_block" {
 
 
 variable "csi_prod_deployment_region" {
+  type    = string
   default     = "us-west-2"
   description = "Deployment region of the signaling and controling infrastructure"
 
@@ -155,25 +194,31 @@ variable "csi_prod_deployment_region" {
 
 
 variable "lb_prefix" {
+  type    = string
   default = "lb_log"
 }
 
 
 
 variable "cloudwatch_kurento_worker_log_name" {
+  type    = string
   default = "kurento_workers_logs"
 }
 
 
-variable "aws_account_id" { }
+variable "aws_account_id" { 
+  type    = string
+}
 
 
 variable "kurento_stats_server_namespace" {
+  type    = string
   default = "Kurento-customer"
 }
 
 
 variable "s3_bucket_force_destroy" {
+  type    = bool
   default = true
 }
 
@@ -202,10 +247,12 @@ variable "aws_ecr_docker_token" {
 }
 
 variable "docker_worker_log_dir" {
+  type    = string
   default = "/var/log/videoengager"
 }
 
 variable "docker_ec2_type" {
+  type    = string
   default = "t3.medium"
 }
 
@@ -252,4 +299,20 @@ variable "play_nodes_count" {
     condition     = var.play_nodes_count < 20
     error_message = "The value of play_nodes_count must be less than 20."
   }
+}
+
+variable "use_separate_turn_service" {
+  default = false
+  type = bool
+  description = "if true creates pair of coturn ec2 instances"
+}
+
+variable "turn_ec2_type" {
+  default = "t3.small"
+}
+
+variable "remote_efs_address" {
+  default = null
+  type = string
+  description = "if not null app uses this filesystem to store final recording files.Please note that you must use different values for media_input_mount_dir and media_output_mount_dir "
 }

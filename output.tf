@@ -13,6 +13,11 @@ output "efs" {
   description = "The efs info."
 }
 
+output "alternative_remote_efs" {
+  value       = var.remote_efs_address
+  description = "The alternative efs info."
+}
+
 
 output "vpc_peering_id" {
   value       = aws_vpc_peering_connection.peer.*.id

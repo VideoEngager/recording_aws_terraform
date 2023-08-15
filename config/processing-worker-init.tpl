@@ -5,14 +5,16 @@ touch /etc/profile.d/load_env.sh
 
 {
     echo "export EFS=\"${efs_dns_name}\""
-    echo "export MEDIA_DIR=\"${media_output_dir}\""
+    echo "export OUTPUT_EFS=\"${output_efs_dns_name}\""
+    echo "export MEDIA_DIR=\"${media_input_dir}\""
+    echo "export MEDIA_OUTPUT_DIR=\"${media_output_dir}\""
     echo "export MEDIA_MIXER_DIR=\"${media_mixer_dir}\""
     echo "export MEDIA_FILE_READY_DIR=\"${media_file_ready_dir}\""
 
     echo "export RECSVC_LISTEN_PORT=\"${recsvc_listen_port}\""
     echo "export MIXER_TOOL=\"${mixer_tool}\""
 
-    echo "export MIXER_OUTDIR=\"${media_output_dir}${media_mixer_dir}\""
+    echo "export MIXER_OUTDIR=\"${media_input_dir}${media_mixer_dir}\""
     echo "export UPLOADER_PATH=\"${media_output_dir}${media_file_ready_dir}\""
     # echo "export MIXER_OUTDIR=\"$MEDIA_DIR$MEDIA_MIXER_DIR\"" >> /etc/profile.d/load_env.sh
     # echo "export UPLOADER_PATH=\"$MEDIA_DIR$MEDIA_FILE_READY_DIR\"" >> /etc/profile.d/load_env.sh
@@ -53,6 +55,13 @@ sudo mkdir -p "$MEDIA_DIR""$MEDIA_MIXER_DIR"
 sudo mkdir -p "$MEDIA_DIR""$MEDIA_FILE_READY_DIR"
 sudo chmod 777 "$MEDIA_DIR"
 sudo su -c "echo \"$EFS\":/ \"$MEDIA_DIR\" nfs4 defaults,_netdev 0 0 >> /etc/fstab"
+if [ "$MEDIA_DIR" != "$MEDIA_OUTPUT_DIR" ] && [ "$EFS" != "$OUTPUT_EFS" ]; then
+    sudo mkdir -p "$MEDIA_OUTPUT_DIR"
+    sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport "$OUTPUT_EFS":/ "$MEDIA_OUTPUT_DIR"
+    sudo mkdir -p "$MEDIA_OUTPUT_DIR""$MEDIA_FILE_READY_DIR"
+    sudo chmod 777 "$MEDIA_OUTPUT_DIR"
+    sudo su -c "echo \"$OUTPUT_EFS\":/ \"$MEDIA_OUTPUT_DIR\" nfs4 defaults,_netdev 0 0 >> /etc/fstab"
+fi
 
 echo "Launching Recsvc..."
 sudo systemctl start recsvc.service
