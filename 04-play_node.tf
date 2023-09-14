@@ -5,7 +5,14 @@ data "aws_ami" "play_worker_ami" {
   filter {
     name = "name"
     values = [
-      "play-prod-ami-*"
+      "play-${var.ami_version}-ami-*"
+    ]
+  }
+
+  filter {
+    name = "tag:Version"
+    values = [
+      var.ami_version
     ]
   }
 
@@ -47,7 +54,7 @@ resource "aws_instance" "play_worker" {
   instance_type        = var.play_ec2_type
   subnet_id            = (count.index % 2 == 0 ? aws_subnet.main-public-1.id : aws_subnet.main-public-2.id)
   iam_instance_profile = aws_iam_instance_profile.CloudWatch_Profile.name
-  private_ip           = local.play_nodes_private_ips[count.index]
+  #private_ip           = local.play_nodes_private_ips[count.index]
   user_data            = data.template_file.play_worker_init[count.index].rendered
 
   monitoring    = true
@@ -72,12 +79,14 @@ resource "aws_instance" "play_worker" {
     aws_cloudwatch_log_group.playsvc_log_group,
     aws_cloudwatch_log_stream.playsvc_log_stream_processing_units,
     aws_efs_mount_target.kurento-worker-1,
-    aws_efs_mount_target.kurento-worker-2
+    aws_efs_mount_target.kurento-worker-2,
+    aws_instance.processing_worker
   ]
 
   tags = {
-    Name        = "PlayWorker-${count.index+1}-${var.tenant_id}-${var.infrastructure_purpose}"
+    Name        = "PlayWorker-${count.index+1}-${var.tenant_id}-${var.ami_version}"
     Environment = var.infrastructure_purpose
+    Version     = var.ami_version
   }
 
 }

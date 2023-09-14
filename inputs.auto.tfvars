@@ -3,24 +3,26 @@ access_key=""
 secret_key=""
 
 deployment_region = ""
+ami_version = ""
+vpc_cidr_block ="X.X.X.X/16"
 
-ec2_type = "t3.small"
-pn_ec2_type = "t3.medium"
-docker_ec2_type = "t3.medium"
+# [optional variables]
+#
+# ec2_type = ""
+# pn_ec2_type = ""
+# docker_ec2_type = ""
 
-vpc_cidr_block ="10.231.0.0/16"
+# use_play_service = true
+# use_archiver_service = true
+# play_ec2_type = "t3.small"
 
-nodes_count = 2
+# use_private_link = false
+# use_elastic_ip = false
 
-use_play_service = false
-play_ec2_type = "t3.small"
-play_service_cert_arn=""
+# use_docker_workers = false
+# aws_ecr_docker_token = ""
 
-use_private_link = false
-use_elastic_ip = true
-
-use_docker_workers = false
-aws_ecr_docker_token = ""
+# isEFSEncrypted = false
 
 #steps:
 # 1. Fill variables

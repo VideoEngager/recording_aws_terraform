@@ -1,5 +1,5 @@
 locals {  
-  kurento_instance_names = [for a in range(local.kurento_nodes):"KurentoWorker-${a+1}-${var.tenant_id}-${var.infrastructure_purpose}"]
+  kurento_instance_names = [for a in range(local.kurento_nodes):"KurentoWorker-${a+1}-${var.tenant_id}-${var.ami_version}"]
 }
 
 
@@ -10,7 +10,15 @@ data "aws_ami" "kurento_worker_ami" {
   filter {
     name = "name"
     values = [
-      "kurento-prod-ami-*"
+      "kurento-${var.ami_version}-ami-*"
+    ]
+  }
+
+  
+  filter {
+    name = "tag:Version"
+    values = [
+      var.ami_version
     ]
   }
 
@@ -96,6 +104,7 @@ resource "aws_instance" "kurento_worker" {
   tags = {
     Name        = local.kurento_instance_names[count.index]
     Environment = var.infrastructure_purpose
+    Version     = var.ami_version
   }
 
 }

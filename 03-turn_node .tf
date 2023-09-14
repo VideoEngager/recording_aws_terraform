@@ -1,5 +1,5 @@
 locals {  
-  turn_instance_names = [for a in range(local.turn_nodes):"TurnWorker-${a+1}-${var.tenant_id}-${var.infrastructure_purpose}"]
+  turn_instance_names = [for a in range(local.turn_nodes):"TurnWorker-${a+1}-${var.tenant_id}-${var.ami_version}"]
   use_turn_nodes = var.use_separate_turn_service
 }
 
@@ -67,6 +67,7 @@ resource "aws_instance" "turn_worker" {
   tags = {
     Name        = local.turn_instance_names[count.index]
     Environment = var.infrastructure_purpose
+    Version     = var.ami_version
   }
 
 }
