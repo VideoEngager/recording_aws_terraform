@@ -329,7 +329,7 @@ variable "use_archiver_service" {
 }
 
 variable "ami_version" {
-  default = "prod"
+  default = "v5.37"
   type = string
   description = "Recording version to install"
 }
