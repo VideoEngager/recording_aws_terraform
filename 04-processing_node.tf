@@ -37,7 +37,7 @@ data "template_file" "processing_worker_init" {
     genesys_password          = var.genesys_password
     reporter_url              = local.reporter_url
 
-    service_log_file_path = "/recsvc/log/logrecsvc_*"
+    service_log_file_path = "/recsvc/log/*.log"
     log_group_name        = aws_cloudwatch_log_group.recsvc_log_group.name
     log_stream_name       = aws_cloudwatch_log_stream.recsvc_log_stream_processing_units[count.index].name
 
