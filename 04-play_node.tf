@@ -5,14 +5,15 @@ data "aws_ami" "play_worker_ami" {
   filter {
     name = "name"
     values = [
-      "play-${var.ami_version}-ami-*"
+      "play-${local.getLatest ? "*" : var.ami_version}-ami-*"
     ]
   }
 
+  
   filter {
-    name = "tag:Version"
+    name = local.getLatest ? "tag-key" : "tag:Version"
     values = [
-      var.ami_version
+      local.getLatest ? "Latest" : var.ami_version
     ]
   }
 

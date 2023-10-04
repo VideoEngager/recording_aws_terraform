@@ -10,15 +10,15 @@ data "aws_ami" "kurento_worker_ami" {
   filter {
     name = "name"
     values = [
-      "kurento-${var.ami_version}-ami-*"
+      "kurento-${local.getLatest ? "*" : var.ami_version}-ami-*"
     ]
   }
 
   
   filter {
-    name = "tag:Version"
+    name = local.getLatest ? "tag-key" : "tag:Version"
     values = [
-      var.ami_version
+      local.getLatest ? "Latest" : var.ami_version
     ]
   }
 
