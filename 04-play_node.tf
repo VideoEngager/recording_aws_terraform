@@ -85,9 +85,9 @@ resource "aws_instance" "play_worker" {
   ]
 
   tags = {
-    Name        = "PlayWorker-${count.index+1}-${var.tenant_id}-${var.ami_version}"
+    Name        = "PlayWorker-${count.index+1}-${var.tenant_id}-${data.aws_ami.play_worker_ami.tags["Version"]}"
     Environment = var.infrastructure_purpose
-    Version     = var.ami_version
+    Version     = data.aws_ami.play_worker_ami.tags["Version"]
   }
 
 }

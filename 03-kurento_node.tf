@@ -1,5 +1,5 @@
 locals {  
-  kurento_instance_names = [for a in range(local.kurento_nodes):"KurentoWorker-${a+1}-${var.tenant_id}-${var.ami_version}"]
+  kurento_instance_names = [for a in range(local.kurento_nodes):"KurentoWorker-${a+1}-${var.tenant_id}-${data.aws_ami.kurento_worker_ami.tags["Version"]}"]
 }
 
 
@@ -104,7 +104,7 @@ resource "aws_instance" "kurento_worker" {
   tags = {
     Name        = local.kurento_instance_names[count.index]
     Environment = var.infrastructure_purpose
-    Version     = var.ami_version
+    Version     = data.aws_ami.kurento_worker_ami.tags["Version"]
   }
 
 }

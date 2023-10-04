@@ -98,9 +98,9 @@ resource "aws_instance" "processing_worker" {
   ]
 
   tags = {
-    Name        = "ProcessingWorker-${count.index+1}-${var.tenant_id}-${var.ami_version}"
+    Name        = "ProcessingWorker-${count.index+1}-${var.tenant_id}-${data.aws_ami.processing_worker_ami.tags["Version"]}"
     Environment = var.infrastructure_purpose
-    Version     = var.ami_version
+    Version     = data.aws_ami.processing_worker_ami.tags["Version"]
   }
 
 }
