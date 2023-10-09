@@ -25,7 +25,7 @@ echo "$(date) Mounting EFS volume"
 mkdir -p ${media_output_dir}
 mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${efs_dns_name}:/ ${media_output_dir}
 
-echo "${efs_dns_name}:/ ${media_output_dir} nfs4 defaults,_netdev 0 0" >> /etc/fstab
+echo "${efs_dns_name}:/ ${media_output_dir} nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 mkdir ${media_output_dir}/outdir
 mkdir ${media_output_dir}/s3
 chmod 777 -R ${media_output_dir}
