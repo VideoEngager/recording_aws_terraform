@@ -25,14 +25,15 @@ data "template_file" "docker_worker_init" {
     playback_base_url        = local.reporter_docker_play_url
 
     coturn_listener_port     = var.coturn_listener_port
-    play_listener_port       = var.play_listener_port    
+    play_listener_port       = var.play_listener_port  
+    archiver_listener_port   = var.archiver_service_listen_port  
     internal_ip              = local.kurento_nodes_private_ips[count.index]
     turn_server_username     = random_string.random_username.result
     turn_server_password     = random_password.password.result
 
     efs_dns_name     = local.create_efs ? aws_efs_file_system.recording-efs[0].dns_name : var.custom_efs_address
     media_output_dir = var.media_input_mount_dir
-
+    
     docker_token     = var.aws_ecr_docker_token 
     log_dir          = var.docker_worker_log_dir
   }
@@ -56,6 +57,11 @@ resource "aws_instance" "docker_worker" {
 
   monitoring    = true
   ebs_optimized = true
+  # key_name = "sshkeyname"
+
+  root_block_device {
+    volume_size = 16
+  }
 
   # EC2 instances should disable IMDS or require IMDSv2 as this can be related to the weaponization phase of kill chain
   metadata_options {
@@ -65,7 +71,8 @@ resource "aws_instance" "docker_worker" {
 
   vpc_security_group_ids = [
     aws_security_group.kurento_worker_sg.id,
-    aws_security_group.processing_worker_sg.id
+    aws_security_group.processing_worker_sg.id,
+    aws_security_group.play_worker_sg.id
   ]
 
   depends_on = [
@@ -92,4 +99,18 @@ resource "aws_lb_target_group_attachment" "docker_kurento_target_group_attachmen
   target_group_arn = aws_lb_target_group.kurento_target_group.arn
   target_id        = aws_instance.docker_worker[count.index].id
   port             = 8888
+}
+
+resource "aws_lb_target_group_attachment" "docker_play_target_group_attachment" {
+  count            = var.use_docker_workers && var.use_play_service ? local.kurento_nodes : 0
+  target_group_arn = aws_lb_target_group.play_target_group[0].arn
+  target_id        = aws_instance.docker_worker[count.index].id
+  port             = var.play_listener_port
+}
+
+resource "aws_lb_target_group_attachment" "docker_archiver_target_group_attachment" {
+  count            = var.use_docker_workers && var.use_archiver_service ? local.kurento_nodes : 0
+  target_group_arn = aws_lb_target_group.archiver_target_group[0].arn
+  target_id        = aws_instance.docker_worker[count.index].id
+  port             = var.archiver_service_listen_port
 }

@@ -77,6 +77,20 @@ services:
        - ${log_dir}/:/var/log/supervisor/
        - ${media_output_dir}/:/rec
 
+  archiver:
+    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-archiver:latest
+    environment: 
+      - ARCHIVER_BASE_PATH=${media_output_dir}
+      - ARCHIVER_LISTEN_PORT=${archiver_listener_port}
+    restart: always
+    tty: true
+    container_name: archiver_worker
+    ports:
+      - ${archiver_listener_port}:${archiver_listener_port}
+    volumes:
+       - ${log_dir}/:/archivesvc/log/
+       - ${media_output_dir}/:/rec
+
 
   coturn:
     image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-turn:latest
