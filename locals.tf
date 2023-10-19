@@ -17,4 +17,5 @@ locals {
   efs_dns_name = local.create_efs ? aws_efs_file_system.recording-efs[0].dns_name : var.custom_efs_address
 
   remote_efs_validation = var.remote_efs_address == null ? true : (var.media_input_mount_dir != var.media_output_mount_dir ? true : tobool("When you are using remote_efs_address -> media_input_mount_dir must be different from media_output_mount_dir"))
+  getLatest = lower(var.ami_version)=="latest"
 }

@@ -3,7 +3,6 @@ access_key=""
 secret_key=""
 
 deployment_region = ""
-ami_version = ""
 vpc_cidr_block ="X.X.X.X/16"
 
 # [optional variables]
@@ -23,6 +22,7 @@ vpc_cidr_block ="X.X.X.X/16"
 # aws_ecr_docker_token = ""
 
 # isEFSEncrypted = false
+# ami_version = "XXXXX"
 
 #steps:
 # 1. Fill variables
