@@ -1,6 +1,7 @@
 data "aws_ami" "play_worker_ami" {
   most_recent = true
   owners      = ["376474804475"]
+  count = var.use_docker_workers ? 0 : 1
 
   filter {
     name = "name"
@@ -51,7 +52,7 @@ data "template_file" "play_worker_init" {
 
 resource "aws_instance" "play_worker" {
   count                = (var.use_docker_workers || !var.use_play_service) ? 0 : local.play_nodes
-  ami                  = data.aws_ami.play_worker_ami.id
+  ami                  = data.aws_ami.play_worker_ami[0].id
   instance_type        = var.play_ec2_type
   subnet_id            = (count.index % 2 == 0 ? aws_subnet.main-public-1.id : aws_subnet.main-public-2.id)
   iam_instance_profile = aws_iam_instance_profile.CloudWatch_Profile.name
@@ -85,9 +86,9 @@ resource "aws_instance" "play_worker" {
   ]
 
   tags = {
-    Name        = "PlayWorker-${count.index+1}-${var.tenant_id}-${data.aws_ami.play_worker_ami.tags["Version"]}"
+    Name        = "PlayWorker-${count.index+1}-${var.tenant_id}-${data.aws_ami.play_worker_ami[0].tags["Version"]}"
     Environment = var.infrastructure_purpose
-    Version     = data.aws_ami.play_worker_ami.tags["Version"]
+    Version     = data.aws_ami.play_worker_ami[0].tags["Version"]
   }
 
 }

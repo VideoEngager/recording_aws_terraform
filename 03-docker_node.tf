@@ -30,6 +30,7 @@ data "template_file" "docker_worker_init" {
     internal_ip              = local.kurento_nodes_private_ips[count.index]
     turn_server_username     = random_string.random_username.result
     turn_server_password     = random_password.password.result
+    image_version            = var.ami_version
 
     efs_dns_name     = local.create_efs ? aws_efs_file_system.recording-efs[0].dns_name : var.custom_efs_address
     media_output_dir = var.media_input_mount_dir

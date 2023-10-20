@@ -36,7 +36,7 @@ version: '3'
 
 services:
   kurento_worker:
-    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-kurento:latest
+    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-kurento:${image_version}
     environment:
       - TURN_URL=${turn_server_username}:${turn_server_password}@$EXTERNAL_IP:${coturn_listener_port}
     ports:
@@ -49,7 +49,7 @@ services:
        - ${media_output_dir}/:/rec
 
   play:
-    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-play:latest
+    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-play:${image_version}
     environment: 
       - PLAYBACK_BASE_URL=${playback_base_url}
       - PLAYSVC_LISTEN_PORT=${play_listener_port}
@@ -64,7 +64,7 @@ services:
 
 
   processing_worker:
-    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-processing:latest
+    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-processing:${image_version}
     environment: 
       - PLAYBACK_BASE_URL=https://videome.leadsecure.com
     restart: always
@@ -78,7 +78,7 @@ services:
        - ${media_output_dir}/:/rec
 
   archiver:
-    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-archiver:latest
+    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-archiver:${image_version}
     environment: 
       - ARCHIVER_BASE_PATH=${media_output_dir}
       - ARCHIVER_LISTEN_PORT=${archiver_listener_port}
@@ -93,7 +93,7 @@ services:
 
 
   coturn:
-    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-turn:latest
+    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-turn:${image_version}
     environment: 
       - PUBLIC_IP=$EXTERNAL_IP
       - PRIVATE_IP=${internal_ip}

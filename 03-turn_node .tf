@@ -1,5 +1,5 @@
 locals {  
-  turn_instance_names = [for a in range(local.turn_nodes):"TurnWorker-${a+1}-${var.tenant_id}-${data.aws_ami.kurento_worker_ami.tags["Version"]}"]
+  turn_instance_names = [for a in range(local.turn_nodes):"TurnWorker-${a+1}-${var.tenant_id}-${data.aws_ami.kurento_worker_ami[0].tags["Version"]}"]
   use_turn_nodes = var.use_separate_turn_service
 }
 
@@ -35,7 +35,7 @@ resource "aws_eip_association" "turn_eip_assoc" {
 
 resource "aws_instance" "turn_worker" {
   count                = var.use_docker_workers ? 0 : local.turn_nodes
-  ami                  = data.aws_ami.kurento_worker_ami.id
+  ami                  = data.aws_ami.kurento_worker_ami[0].id
   instance_type        = var.turn_ec2_type
   subnet_id            = (count.index % 2 == 0 ? aws_subnet.main-public-1.id : aws_subnet.main-public-2.id )
   iam_instance_profile = aws_iam_instance_profile.CloudWatch_Profile.name
@@ -67,7 +67,7 @@ resource "aws_instance" "turn_worker" {
   tags = {
     Name        = local.turn_instance_names[count.index]
     Environment = var.infrastructure_purpose
-    Version     = data.aws_ami.kurento_worker_ami.tags["Version"]
+    Version     = data.aws_ami.kurento_worker_ami[0].tags["Version"]
   }
 
 }
