@@ -27,7 +27,7 @@ variable "availability_zone_2" {
 }
 
 variable "ec2_type" {
-  default = "t3.medium"
+  default = "t3.small"
   type    = string
 }
 variable "pn_ec2_type" {
@@ -85,6 +85,11 @@ variable "recording_endpoint_port" {
 variable "recording_service_listen_port" {
   type    = number
   default = 7002
+}
+
+variable "archiver_service_listen_port" {
+  type    = number
+  default = 7022
 }
 
 variable "mixer_tool" {
@@ -315,4 +320,16 @@ variable "remote_efs_address" {
   default = null
   type = string
   description = "if not null app uses this filesystem to store final recording files.Please note that you must use different values for media_input_mount_dir and media_output_mount_dir "
+}
+
+variable "use_archiver_service" {
+  default = false
+  type = bool
+  description = "if true enables archiver service"
+}
+
+variable "ami_version" {
+  default = "latest"
+  type = string
+  description = "Recording version to install"
 }

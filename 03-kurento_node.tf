@@ -1,16 +1,24 @@
 locals {  
-  kurento_instance_names = [for a in range(local.kurento_nodes):"KurentoWorker-${a+1}-${var.tenant_id}-${var.infrastructure_purpose}"]
+  kurento_instance_names = var.use_docker_workers ? [] : [for a in range(local.kurento_nodes):"KurentoWorker-${a+1}-${var.tenant_id}-${data.aws_ami.kurento_worker_ami[0].tags["Version"]}"]
 }
 
 
 data "aws_ami" "kurento_worker_ami" {
   most_recent = true
   owners      = ["376474804475"]
-
+  count = var.use_docker_workers ? 0 : 1
   filter {
     name = "name"
     values = [
-      "kurento-prod-ami-*"
+      "kurento-${local.getLatest ? "*" : var.ami_version}-ami-*"
+    ]
+  }
+
+  
+  filter {
+    name = local.getLatest ? "tag-key" : "tag:Version"
+    values = [
+      local.getLatest ? "Latest" : var.ami_version
     ]
   }
 
@@ -18,7 +26,7 @@ data "aws_ami" "kurento_worker_ami" {
 
 
 data "template_file" "kurento_worker_init" {
-  count = local.kurento_nodes
+  count = var.use_docker_workers ? 0 : local.kurento_nodes
   template = local.use_turn_nodes ? file("./config/kurento-noturn-worker-init.tpl") : file("./config/kurento-worker-init.tpl")
   vars = {
     kurento_service_log_file_path = "/var/log/kurento-media-server/*.log"
@@ -61,7 +69,7 @@ resource "aws_eip_association" "eip_assoc" {
 
 resource "aws_instance" "kurento_worker" {
   count                = var.use_docker_workers ? 0 : local.kurento_nodes
-  ami                  = data.aws_ami.kurento_worker_ami.id
+  ami                  = data.aws_ami.kurento_worker_ami[0].id
   instance_type        = var.ec2_type
   subnet_id            = (count.index % 2 == 0 ? aws_subnet.main-public-1.id : aws_subnet.main-public-2.id )
   iam_instance_profile = aws_iam_instance_profile.CloudWatch_Profile.name
@@ -96,6 +104,7 @@ resource "aws_instance" "kurento_worker" {
   tags = {
     Name        = local.kurento_instance_names[count.index]
     Environment = var.infrastructure_purpose
+    Version     = data.aws_ami.kurento_worker_ami[0].tags["Version"]
   }
 
 }

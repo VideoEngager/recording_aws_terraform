@@ -84,6 +84,12 @@ resource "aws_cloudwatch_log_stream" "playsvc_log_stream_processing_units" {
   log_group_name = aws_cloudwatch_log_group.playsvc_log_group.name
 }
 
+resource "aws_cloudwatch_log_stream" "recsvc_log_stream_archiver_units" {
+  count          = local.processing_nodes
+  name           = "logs-archiver-worker-${count.index+1}"
+  log_group_name = aws_cloudwatch_log_group.recsvc_log_group.name
+}
+
 
 
 /******* Specify log metrics ********/

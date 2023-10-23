@@ -25,7 +25,7 @@ echo "$(date) Mounting EFS volume"
 mkdir -p ${media_output_dir}
 mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${efs_dns_name}:/ ${media_output_dir}
 
-echo "${efs_dns_name}:/ ${media_output_dir} nfs4 defaults,_netdev 0 0" >> /etc/fstab
+echo "${efs_dns_name}:/ ${media_output_dir} nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 mkdir ${media_output_dir}/outdir
 mkdir ${media_output_dir}/s3
 chmod 777 -R ${media_output_dir}
@@ -36,7 +36,7 @@ version: '3'
 
 services:
   kurento_worker:
-    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-kurento:latest
+    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-kurento:${image_version}
     environment:
       - TURN_URL=${turn_server_username}:${turn_server_password}@$EXTERNAL_IP:${coturn_listener_port}
     ports:
@@ -49,7 +49,7 @@ services:
        - ${media_output_dir}/:/rec
 
   play:
-    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-play:latest
+    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-play:${image_version}
     environment: 
       - PLAYBACK_BASE_URL=${playback_base_url}
       - PLAYSVC_LISTEN_PORT=${play_listener_port}
@@ -64,7 +64,7 @@ services:
 
 
   processing_worker:
-    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-processing:latest
+    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-processing:${image_version}
     environment: 
       - PLAYBACK_BASE_URL=https://videome.leadsecure.com
     restart: always
@@ -77,9 +77,23 @@ services:
        - ${log_dir}/:/var/log/supervisor/
        - ${media_output_dir}/:/rec
 
+  archiver:
+    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-archiver:${image_version}
+    environment: 
+      - ARCHIVER_BASE_PATH=${media_output_dir}
+      - ARCHIVER_LISTEN_PORT=${archiver_listener_port}
+    restart: always
+    tty: true
+    container_name: archiver_worker
+    ports:
+      - ${archiver_listener_port}:${archiver_listener_port}
+    volumes:
+       - ${log_dir}/:/archivesvc/log/
+       - ${media_output_dir}/:/rec
+
 
   coturn:
-    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-turn:latest
+    image: 376474804475.dkr.ecr.eu-west-1.amazonaws.com/recording-turn:${image_version}
     environment: 
       - PUBLIC_IP=$EXTERNAL_IP
       - PRIVATE_IP=${internal_ip}
