@@ -1,6 +1,5 @@
 locals {  
   turn_instance_names = [for a in range(local.turn_nodes):"TurnWorker-${a+1}-${var.tenant_id}-${data.aws_ami.kurento_worker_ami[0].tags["Version"]}"]
-  use_turn_nodes = var.use_separate_turn_service
 }
 
 
@@ -55,9 +54,10 @@ resource "aws_instance" "turn_worker" {
     http_tokens   = "required"
   }
 
-  vpc_security_group_ids = [
-    aws_security_group.kurento_worker_sg.id
-  ]
+  vpc_security_group_ids = concat([
+    aws_security_group.kurento_worker_sg.id],
+    aws_security_group.ssh_access_sg.*.id
+  )
 
   depends_on = [
     aws_cloudwatch_log_group.kurento_log_group,

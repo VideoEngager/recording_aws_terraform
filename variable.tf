@@ -333,3 +333,15 @@ variable "ami_version" {
   type = string
   description = "Recording version to install"
 }
+
+variable "use_aws_accelerator_ips" {
+  default = []
+  type = list(string)
+  description = "if in use will place separate kurento instances in private availability groups and add ips as kurento's externalIPv4 param."
+}
+
+variable "allow_ssh_access_ips" {
+  default = []
+  type = list(string)
+  description = "If set allows ssh access from provided list of ip addresses, Example 10.11.12.13/32 to allow 10.11.12.13 ip ssh access. "
+}

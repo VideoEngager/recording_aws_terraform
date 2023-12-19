@@ -1,8 +1,9 @@
 locals {
+  use_turn_nodes = var.use_separate_turn_service || length(var.use_aws_accelerator_ips)>1
   kurento_nodes = var.kurento_nodes_count * 2
   processing_nodes = var.processing_nodes_count * 2
   play_nodes = var.play_nodes_count * 2
-  turn_nodes = var.use_separate_turn_service ? 2 : 0
+  turn_nodes = local.use_turn_nodes ? 2 : 0
   cidr_block_subnet_public_1 =  cidrsubnet(var.vpc_cidr_block, 8, 1)
   cidr_block_subnet_public_2 =  cidrsubnet(var.vpc_cidr_block, 8, 2)
   cidr_block_subnet_private_1 = cidrsubnet(var.vpc_cidr_block, 8, 3)
