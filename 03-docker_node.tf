@@ -70,11 +70,11 @@ resource "aws_instance" "docker_worker" {
     http_tokens   = "required"
   }
 
-  vpc_security_group_ids = [
+  vpc_security_group_ids = concat([
     aws_security_group.kurento_worker_sg.id,
     aws_security_group.processing_worker_sg.id,
-    aws_security_group.play_worker_sg.id
-  ]
+    aws_security_group.play_worker_sg.id],
+    aws_security_group.ssh_access_sg.*.id)
 
   depends_on = [
     aws_efs_file_system.recording-efs,

@@ -212,8 +212,20 @@ resource "aws_security_group" "kurento_worker_sg" {
     protocol  = "tcp"
     cidr_blocks = [
       local.cidr_block_subnet_public_1,
-      local.cidr_block_subnet_public_2
+      local.cidr_block_subnet_public_2,
+      local.cidr_block_subnet_private_1,
+      local.cidr_block_subnet_private_2
     ]
+  }
+
+    dynamic "ingress" {
+    for_each = length(var.use_aws_accelerator_ips)>0 ? ["ok"] : []
+    content {
+      from_port = 8888
+      to_port   = 8888
+      protocol  = "tcp"
+      prefix_list_ids = [data.aws_ec2_managed_prefix_list.route53healthchecks.id]
+    }
   }
 
 
@@ -328,3 +340,40 @@ resource "aws_security_group" "play_lb_sg" {
   }
 
 }
+
+resource "aws_security_group" "ssh_access_sg" {
+  count       = length(var.allow_ssh_access_ips)>0 ? 1 : 0
+  vpc_id      = aws_vpc.recording_vpc.id
+  name        = "SSH_ACCESS-SG-${var.tenant_id}-${var.infrastructure_purpose}"
+  description = "SSH access from whitelisted hosts"
+
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+
+  ingress {
+      from_port = 22
+      to_port   = 22
+      protocol  = "tcp"
+      cidr_blocks = var.allow_ssh_access_ips
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "SSH_ACCESS-SG-${var.tenant_id}-${var.infrastructure_purpose}"
+  }
+
+}
+
+data "aws_ec2_managed_prefix_list" "route53healthchecks" {
+  name = "com.amazonaws.${var.deployment_region}.route53-healthchecks"
+}
+

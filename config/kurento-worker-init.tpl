@@ -15,6 +15,8 @@ EXTERNAL_IP=`dig +short myip.opendns.com @resolver1.opendns.com`
 
     echo "export COTURN_LISTENER_PORT=\"${coturn_listener_port}\""
     echo "export COTURN_ALT_LISTENER_PORT=\"${coturn_alt_listener_port}\""
+
+    echo "export KURENTO_HOST_IP=\"${kurento_host_ip}\""
     
     echo "export EXTERNAL_IP=\"$EXTERNAL_IP\""
     echo "export INTERNAL_IP=\"${internal_ip}\""

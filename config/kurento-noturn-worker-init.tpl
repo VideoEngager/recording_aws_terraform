@@ -14,6 +14,8 @@ touch /etc/profile.d/load_env.sh
 
     echo "export COTURN_LISTENER_PORT=\"${coturn_listener_port}\""
     echo "export COTURN_ALT_LISTENER_PORT=\"${coturn_alt_listener_port}\""
+
+    echo "export KURENTO_HOST_IP=\"${kurento_host_ip}\""
     
     echo "export EXTERNAL_IP=\"${turn_internal_ip}\""
     echo "export INTERNAL_IP=\"${internal_ip}\""
@@ -41,10 +43,13 @@ set -a; source /etc/profile.d/load_env.sh; set +a
 
 echo "Render turnserver config file"
 envsubst '$COTURN_LISTENER_PORT,$COTURN_ALT_LISTENER_PORT,$EXTERNAL_IP,$INTERNAL_IP,$TURN_SERVER_USERNAME,$TURN_SERVER_PASSWORD,$TURN_SERVER_MIN_PORT,$TURN_SERVER_MAX_PORT' < /home/ubuntu/turnserver-template.conf | sudo tee /etc/turnserver.conf
-envsubst '$COTURN_LISTENER_PORT,$EXTERNAL_IP,$TURN_SERVER_USERNAME,$TURN_SERVER_PASSWORD' < /home/ubuntu/launch-kms-tempate.sh | sudo tee /usr/local/bin/launch-kms.sh
-sudo chmod 755 /usr/local/bin/launch-kms.sh
 
-
+if [ -n "$KURENTO_HOST_IP" ]; then
+    echo "turnURL=$TURN_SERVER_USERNAME:$TURN_SERVER_PASSWORD@$EXTERNAL_IP:$COTURN_LISTENER_PORT" > /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
+    echo "externalIPv4=$KURENTO_HOST_IP" >> /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
+    echo "minPort=$TURN_SERVER_MIN_PORT" >> /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini
+    echo "maxPort=$TURN_SERVER_MAX_PORT" >> /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini
+fi
 
 echo "Render Kurento Stats Config file and start Service"
 envsubst '$AWS_MONITORING_ACCESS_KEY,$AWS_MONITORING_SECRET_KEY,$REGION,$STATS_NAMESPACE,$INSTANCE_NAME' < /home/ubuntu/kurentostats-template.conf | sudo tee /opt/kmon/kurentostats.conf
@@ -66,6 +71,7 @@ sudo chmod 777 "$MEDIA_DIR"
 sudo su -c "echo \"$EFS\":/ \"$MEDIA_DIR\" nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0 >> /etc/fstab"
 
 echo "Launching Media Server..."
-sudo /usr/local/bin/launch-kms.sh
+sudo systemctl stop  kms.service
+sudo systemctl start  kms.service
 sudo systemctl stop coturn
 sudo systemctl disable coturn

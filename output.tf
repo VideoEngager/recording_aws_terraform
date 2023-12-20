@@ -55,3 +55,7 @@ output "play_service_url_hosted_zone" {
   value       = aws_lb.play_load_balancer.*.zone_id
   description = "The hosted zone of play service load balancer."
 }
+
+output "accelerator_to_instance_links" {
+  value = [for i, v in var.use_aws_accelerator_ips : "${v} -> ${aws_instance.kurento_worker[i].id} (${aws_instance.kurento_worker[i].tags_all.Name})"]
+}

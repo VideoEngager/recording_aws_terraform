@@ -33,6 +33,7 @@ touch /etc/profile.d/load_env.sh
     echo "export ARCHIVER_BASE_PATH=\"${media_output_dir}\""
     echo "export ARCHIVER_LOG_STREAM_NAME=\"${archiver_log_stream_name}\""
     echo "export ARCHIVER_SERVICE_LOG_FILE_PATH=\"${archiver_log_file_path}\""
+    echo "export ARCHIVER_BASE_URL=\"${archiver_base_url}\""
 
 } >> /etc/profile.d/load_env.sh
 
@@ -51,7 +52,7 @@ envsubst '$RECSVC_LISTEN_PORT,$MIXER_TOOL,$MIXER_OUTDIR,$UPLOADER_PATH,$GENESYS_
 echo "Render Archivesvc config file"
 sudo rm -f /archivesvc/config.json
 sudo systemctl stop archivesvc.service
-envsubst '$ARCHIVER_LISTEN_PORT,$ARCHIVER_BASE_PATH' < /archivesvc/config_template.json | sudo tee /archivesvc/config.json
+envsubst '$ARCHIVER_LISTEN_PORT,$ARCHIVER_BASE_PATH,$ARCHIVER_BASE_URL' < /archivesvc/config_template.json | sudo tee /archivesvc/config.json
 
 
 echo "Render Cloudwatch Config file and start service"

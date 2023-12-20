@@ -22,6 +22,7 @@ data "aws_ami" "processing_worker_ami" {
 
 locals {
   reporter_url = "${lookup(var.reporter_host, var.infrastructure_purpose)}${var.reporter_path}"
+  reporter_archiver_url = "${lookup(var.reporter_host, var.infrastructure_purpose)}"
 }
 
 
@@ -54,7 +55,7 @@ data "template_file" "processing_worker_init" {
     archiver_listen_port = var.archiver_service_listen_port
     archiver_log_stream_name = aws_cloudwatch_log_stream.recsvc_log_stream_archiver_units[count.index].name
     archiver_log_file_path = "/var/log/archivesvc/logs.log"
-
+    archiver_base_url = local.reporter_archiver_url
   }
 }
 
@@ -84,9 +85,10 @@ resource "aws_instance" "processing_worker" {
     volume_size = 16
   }
 
-  vpc_security_group_ids = [
-    aws_security_group.processing_worker_sg.id
-  ]
+  vpc_security_group_ids = concat([
+    aws_security_group.processing_worker_sg.id],
+    aws_security_group.ssh_access_sg.*.id
+  )
 
   depends_on = [
     aws_efs_file_system.recording-efs,

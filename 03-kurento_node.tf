@@ -45,7 +45,7 @@ data "template_file" "kurento_worker_init" {
     turn_server_min_port     = var.min_port
     turn_server_max_port     = var.max_port
     turn_internal_ip         = local.use_turn_nodes ? local.turn_nodes_private_ips[(count.index%2==0) ? 0 : 1] : "127.0.0.1"
-
+    kurento_host_ip          = local.use_turn_nodes ? var.use_aws_accelerator_ips[(count.index%2==0) ? 0 : 1] : ""
 
     kurento_aws_monitoring_access_key = var.kurento_monitoring_aws_access_key
     kurento_aws_monitoring_secret_key = var.kurento_monitoring_aws_secret_key
@@ -71,9 +71,9 @@ resource "aws_instance" "kurento_worker" {
   count                = var.use_docker_workers ? 0 : local.kurento_nodes
   ami                  = data.aws_ami.kurento_worker_ami[0].id
   instance_type        = var.ec2_type
-  subnet_id            = (count.index % 2 == 0 ? aws_subnet.main-public-1.id : aws_subnet.main-public-2.id )
+  subnet_id            = (count.index % 2 == 0 ? (local.use_turn_nodes ? aws_subnet.main-private-1.id : aws_subnet.main-public-1.id) : (local.use_turn_nodes ? aws_subnet.main-private-2.id : aws_subnet.main-public-2.id) )
   iam_instance_profile = aws_iam_instance_profile.CloudWatch_Profile.name
-  private_ip           = local.kurento_nodes_private_ips[count.index]
+  private_ip           = local.use_turn_nodes ? null : local.kurento_nodes_private_ips[count.index]
   user_data            = data.template_file.kurento_worker_init[count.index].rendered
 
   monitoring    = true
@@ -89,9 +89,12 @@ resource "aws_instance" "kurento_worker" {
     http_tokens   = "required"
   }
 
-  vpc_security_group_ids = [
-    aws_security_group.kurento_worker_sg.id
-  ]
+  vpc_security_group_ids = concat([
+    aws_security_group.kurento_worker_sg.id],
+    aws_security_group.ssh_access_sg.*.id
+  )
+
+  
 
   depends_on = [
     aws_efs_file_system.recording-efs,
