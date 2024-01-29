@@ -110,7 +110,7 @@ resource "aws_cloudwatch_log_metric_filter" "log_metric_filter_processing_unit" 
 
 
 resource "aws_cloudwatch_metric_alarm" "target-unhealthy-count" {
-  alarm_name          = "Shared Prod Recoridng - Kurento Target Group health state changed"
+  alarm_name          = "Recoridng ${var.tenant_id} - Kurento Target Group health state changed"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "UnHealthyHostCount"
