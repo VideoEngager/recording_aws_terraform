@@ -1,5 +1,5 @@
 locals {  
-  turn_instance_names = [for a in range(local.turn_nodes):"TurnWorker-${a+1}-${var.tenant_id}-${data.aws_ami.kurento_worker_ami[0].tags["Version"]}"]
+  turn_instance_names = [for a in range(local.turn_nodes):"TurnWorker-${a+1}-${var.tenant_id}-${try(data.aws_ami.kurento_worker_ami[0].tags["Version"], var.ami_version)}"]
 }
 
 
@@ -67,7 +67,7 @@ resource "aws_instance" "turn_worker" {
   tags = {
     Name        = local.turn_instance_names[count.index]
     Environment = var.infrastructure_purpose
-    Version     = data.aws_ami.kurento_worker_ami[0].tags["Version"]
+    Version     = try(data.aws_ami.kurento_worker_ami[0].tags["Version"], var.ami_version)
   }
 
 }
