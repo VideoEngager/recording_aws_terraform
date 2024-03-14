@@ -1,12 +1,12 @@
 resource "aws_iam_instance_profile" "CloudWatch_Profile" {
-  name = "Recording-CloudWatchProfile-${var.tenant_id}-${var.infrastructure_purpose}"
+  name = "Recording-CloudWatchProfile-${var.tenant_id}-${var.infrastructure_purpose}-${random_string.random_username.result}"
   role = aws_iam_role.CloudWatchAgentRole.name
 
 }
 
 
 resource "aws_iam_role_policy" "CloudWatchAgentPolicy" {
-  name = "CloudWatchAgentPolicy-${var.tenant_id}-${var.infrastructure_purpose}"
+  name = "CloudWatchAgentPolicy-${var.tenant_id}-${var.infrastructure_purpose}-${random_string.random_username.result}"
   role = aws_iam_role.CloudWatchAgentRole.id
 
   policy = file("05-1-CloudWatchAgentServerPolicy.json")
@@ -14,7 +14,7 @@ resource "aws_iam_role_policy" "CloudWatchAgentPolicy" {
 
 
 resource "aws_iam_role" "CloudWatchAgentRole" {
-  name = "Recording-${var.tenant_id}-${var.infrastructure_purpose}"
+  name = "Recording-${var.tenant_id}-${var.infrastructure_purpose}-${random_string.random_username.result}"
 
   assume_role_policy = file("05-2-CloudWatchAgentAssumePolicy.json")
 
