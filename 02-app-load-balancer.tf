@@ -58,6 +58,12 @@ resource "aws_lb" "recording_load_balancer" {
     Environment = var.infrastructure_purpose
   }
 
+  lifecycle {
+    ignore_changes = [ 
+      security_groups
+     ]
+  }
+
 }
 
 

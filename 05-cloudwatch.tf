@@ -1,12 +1,12 @@
 resource "aws_iam_instance_profile" "CloudWatch_Profile" {
-  name = "Recording-CloudWatchProfile-${var.tenant_id}-${var.infrastructure_purpose}"
+  name = "Recording-CloudWatchProfile-${var.tenant_id}-${var.infrastructure_purpose}-${random_string.random_username.result}"
   role = aws_iam_role.CloudWatchAgentRole.name
 
 }
 
 
 resource "aws_iam_role_policy" "CloudWatchAgentPolicy" {
-  name = "CloudWatchAgentPolicy-${var.tenant_id}-${var.infrastructure_purpose}"
+  name = "CloudWatchAgentPolicy-${var.tenant_id}-${var.infrastructure_purpose}-${random_string.random_username.result}"
   role = aws_iam_role.CloudWatchAgentRole.id
 
   policy = file("05-1-CloudWatchAgentServerPolicy.json")
@@ -14,7 +14,7 @@ resource "aws_iam_role_policy" "CloudWatchAgentPolicy" {
 
 
 resource "aws_iam_role" "CloudWatchAgentRole" {
-  name = "Recording-${var.tenant_id}-${var.infrastructure_purpose}"
+  name = "Recording-${var.tenant_id}-${var.infrastructure_purpose}-${random_string.random_username.result}"
 
   assume_role_policy = file("05-2-CloudWatchAgentAssumePolicy.json")
 
@@ -110,7 +110,7 @@ resource "aws_cloudwatch_log_metric_filter" "log_metric_filter_processing_unit" 
 
 
 resource "aws_cloudwatch_metric_alarm" "target-unhealthy-count" {
-  alarm_name          = "Shared Prod Recoridng - Kurento Target Group health state changed"
+  alarm_name          = "Recoridng ${var.tenant_id} - Kurento Target Group health state changed"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "UnHealthyHostCount"

@@ -11,12 +11,12 @@ data "aws_ami" "play_worker_ami" {
   }
 
   
-  filter {
-    name = local.getLatest ? "tag-key" : "tag:Version"
-    values = [
-      local.getLatest ? "Latest" : var.ami_version
-    ]
-  }
+  # filter {
+  #   name = local.getLatest ? "tag-key" : "tag:Version"
+  #   values = [
+  #     local.getLatest ? "Latest" : var.ami_version
+  #   ]
+  # }
 
 }
 
@@ -87,9 +87,9 @@ resource "aws_instance" "play_worker" {
   ]
 
   tags = {
-    Name        = "PlayWorker-${count.index+1}-${var.tenant_id}-${data.aws_ami.play_worker_ami[0].tags["Version"]}"
+    Name        = "PlayWorker-${count.index+1}-${var.tenant_id}-${try(data.aws_ami.play_worker_ami[0].tags["Version"], var.ami_version)}"
     Environment = var.infrastructure_purpose
-    Version     = data.aws_ami.play_worker_ami[0].tags["Version"]
+    Version     = try(data.aws_ami.play_worker_ami[0].tags["Version"], var.ami_version)
   }
 
 }

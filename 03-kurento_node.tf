@@ -1,5 +1,5 @@
 locals {  
-  kurento_instance_names = var.use_docker_workers ? [] : [for a in range(local.kurento_nodes):"KurentoWorker-${a+1}-${var.tenant_id}-${data.aws_ami.kurento_worker_ami[0].tags["Version"]}"]
+  kurento_instance_names = var.use_docker_workers ? [] : [for a in range(local.kurento_nodes):"KurentoWorker-${a+1}-${var.tenant_id}-${try(data.aws_ami.kurento_worker_ami[0].tags["Version"],var.ami_version)}"]
 }
 
 
@@ -15,12 +15,12 @@ data "aws_ami" "kurento_worker_ami" {
   }
 
   
-  filter {
-    name = local.getLatest ? "tag-key" : "tag:Version"
-    values = [
-      local.getLatest ? "Latest" : var.ami_version
-    ]
-  }
+  # filter {
+  #   name = local.getLatest ? "tag-key" : "tag:Version"
+  #   values = [
+  #     local.getLatest ? "Latest" : var.ami_version
+  #   ]
+  # }
 
 }
 
@@ -62,6 +62,7 @@ data "template_file" "kurento_worker_init" {
 
 resource "aws_eip_association" "eip_assoc" {
   count         = (!local.use_turn_nodes && var.use_elastic_ip && !var.use_docker_workers) ? local.kurento_nodes : 0
+  # count  = 2 
   instance_id   = aws_instance.kurento_worker[count.index].id
   allocation_id = aws_eip.eip[count.index].id
 }
@@ -107,7 +108,7 @@ resource "aws_instance" "kurento_worker" {
   tags = {
     Name        = local.kurento_instance_names[count.index]
     Environment = var.infrastructure_purpose
-    Version     = data.aws_ami.kurento_worker_ami[0].tags["Version"]
+    Version     = try(data.aws_ami.kurento_worker_ami[0].tags["Version"], var.ami_version)
   }
 
 }
