@@ -9,7 +9,7 @@ data "aws_ami" "processing_worker_ami" {
     ]
   }
 
-  
+
   # filter {
   #   name = local.getLatest ? "tag-key" : "tag:Version"
   #   values = [
@@ -21,13 +21,13 @@ data "aws_ami" "processing_worker_ami" {
 
 
 locals {
-  reporter_url = "${lookup(var.reporter_host, var.infrastructure_purpose)}${var.reporter_path}"
-  reporter_archiver_url = "${lookup(var.reporter_host, var.infrastructure_purpose)}"
+  reporter_url          = "${lookup(var.reporter_host, var.infrastructure_purpose)}${var.reporter_path}"
+  reporter_archiver_url = lookup(var.reporter_host, var.infrastructure_purpose)
 }
 
 
 data "template_file" "processing_worker_init" {
-  count = local.processing_nodes
+  count    = local.processing_nodes
   template = file("./config/processing-worker-init.tpl")
 
   vars = {
@@ -45,17 +45,17 @@ data "template_file" "processing_worker_init" {
 
 
     efs_dns_name         = local.efs_dns_name
-    output_efs_dns_name  = local.remote_efs_validation && var.remote_efs_address!=null ? var.remote_efs_address : local.efs_dns_name
+    output_efs_dns_name  = local.remote_efs_validation && var.remote_efs_address != null ? var.remote_efs_address : local.efs_dns_name
     media_output_dir     = var.media_output_mount_dir
     media_input_dir      = var.media_input_mount_dir
     media_mixer_dir      = var.media_mixer_dir
     media_file_ready_dir = var.media_file_ready_dir
 
-    use_archiver = var.use_archiver_service
-    archiver_listen_port = var.archiver_service_listen_port
+    use_archiver             = var.use_archiver_service
+    archiver_listen_port     = var.archiver_service_listen_port
     archiver_log_stream_name = aws_cloudwatch_log_stream.recsvc_log_stream_archiver_units[count.index].name
-    archiver_log_file_path = "/var/log/archivesvc/logs.log"
-    archiver_base_url = local.reporter_archiver_url
+    archiver_log_file_path   = "/var/log/archivesvc/logs.log"
+    archiver_base_url        = local.reporter_archiver_url
   }
 }
 
@@ -70,7 +70,7 @@ resource "aws_instance" "processing_worker" {
   subnet_id            = (count.index % 2 == 0 ? aws_subnet.main-public-1.id : aws_subnet.main-public-2.id)
   iam_instance_profile = aws_iam_instance_profile.CloudWatch_Profile.name
   #private_ip           = local.processing_nodes_private_ips[count.index]
-  user_data            = data.template_file.processing_worker_init[count.index].rendered
+  user_data = data.template_file.processing_worker_init[count.index].rendered
 
   monitoring    = true
   ebs_optimized = true
@@ -100,7 +100,7 @@ resource "aws_instance" "processing_worker" {
   ]
 
   tags = {
-    Name        = "ProcessingWorker-${count.index+1}-${var.tenant_id}-${try(data.aws_ami.processing_worker_ami[0].tags["Version"],var.ami_version)}"
+    Name        = "ProcessingWorker-${count.index + 1}-${var.tenant_id}-${try(data.aws_ami.processing_worker_ami[0].tags["Version"], var.ami_version)}"
     Environment = var.infrastructure_purpose
     Version     = try(data.aws_ami.processing_worker_ami[0].tags["Version"], var.ami_version)
   }
@@ -115,7 +115,7 @@ resource "aws_lb_target_group_attachment" "processing_target_group_attachment" {
 }
 
 resource "aws_lb_target_group_attachment" "archiver_target_group_attachment" {
-  count            = (var.use_archiver_service && !var.use_docker_workers ) ? local.processing_nodes : 0
+  count            = (var.use_archiver_service && !var.use_docker_workers) ? local.processing_nodes : 0
   target_group_arn = aws_lb_target_group.archiver_target_group[0].arn
   target_id        = aws_instance.processing_worker[count.index].id
   port             = var.archiver_service_listen_port

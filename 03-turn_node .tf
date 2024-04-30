@@ -1,16 +1,16 @@
-locals {  
-  turn_instance_names = [for a in range(local.turn_nodes):"TurnWorker-${a+1}-${var.tenant_id}-${try(data.aws_ami.kurento_worker_ami[0].tags["Version"], var.ami_version)}"]
+locals {
+  turn_instance_names = [for a in range(local.turn_nodes) : "TurnWorker-${a + 1}-${var.tenant_id}-${try(data.aws_ami.kurento_worker_ami[0].tags["Version"], var.ami_version)}"]
 }
 
 
 data "template_file" "turn_worker_init" {
-  count = local.turn_nodes
+  count    = local.turn_nodes
   template = file("./config/turn-worker-init.tpl")
   vars = {
-    coturn_service_log_file_path  = "/var/log/turnserver/turnserver.log"
-    coturn_log_group_name         = aws_cloudwatch_log_group.kurento_log_group.name
-    coturn_log_stream_name        = aws_cloudwatch_log_stream.coturn_log_streams[count.index].name
-    log_name                      = var.cloudwatch_kurento_worker_log_name
+    coturn_service_log_file_path = "/var/log/turnserver/turnserver.log"
+    coturn_log_group_name        = aws_cloudwatch_log_group.kurento_log_group.name
+    coturn_log_stream_name       = aws_cloudwatch_log_stream.coturn_log_streams[count.index].name
+    log_name                     = var.cloudwatch_kurento_worker_log_name
 
     coturn_listener_port     = var.coturn_listener_port
     coturn_alt_listener_port = var.coturn_alt_listener_port
@@ -21,7 +21,7 @@ data "template_file" "turn_worker_init" {
     turn_server_max_port     = var.max_port
 
 
-    instance_name                     = local.turn_instance_names[count.index]
+    instance_name = local.turn_instance_names[count.index]
   }
 }
 
@@ -36,7 +36,7 @@ resource "aws_instance" "turn_worker" {
   count                = var.use_docker_workers ? 0 : local.turn_nodes
   ami                  = data.aws_ami.kurento_worker_ami[0].id
   instance_type        = var.turn_ec2_type
-  subnet_id            = (count.index % 2 == 0 ? aws_subnet.main-public-1.id : aws_subnet.main-public-2.id )
+  subnet_id            = (count.index % 2 == 0 ? aws_subnet.main-public-1.id : aws_subnet.main-public-2.id)
   iam_instance_profile = aws_iam_instance_profile.CloudWatch_Profile.name
   private_ip           = local.turn_nodes_private_ips[count.index]
   user_data            = data.template_file.turn_worker_init[count.index].rendered

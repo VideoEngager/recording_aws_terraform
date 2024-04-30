@@ -97,7 +97,7 @@ resource "aws_internet_gateway" "recording_gateway" {
 # Route tables
 resource "aws_route_table" "recording_public" {
   vpc_id = aws_vpc.recording_vpc.id
- 
+
   lifecycle {
     create_before_destroy = true
 
@@ -110,9 +110,9 @@ resource "aws_route_table" "recording_public" {
 }
 
 resource "aws_route" "internet_access" {
-  route_table_id            = aws_route_table.recording_public.id
-  destination_cidr_block    = var.cidr_block_recording_gateway
-  gateway_id                = aws_internet_gateway.recording_gateway.id
+  route_table_id         = aws_route_table.recording_public.id
+  destination_cidr_block = var.cidr_block_recording_gateway
+  gateway_id             = aws_internet_gateway.recording_gateway.id
 
   depends_on = [
     aws_route_table.recording_public

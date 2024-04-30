@@ -59,9 +59,9 @@ resource "aws_lb" "recording_load_balancer" {
   }
 
   lifecycle {
-    ignore_changes = [ 
+    ignore_changes = [
       security_groups
-     ]
+    ]
   }
 
 }
@@ -133,7 +133,7 @@ resource "aws_lb_target_group" "processing_target_group" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 5
-    interval            = 30  
+    interval            = 30
     matcher             = 200
   }
 }
@@ -199,7 +199,7 @@ resource "aws_lb_target_group" "archiver_target_group" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 5
-    interval            = 30  
+    interval            = 30
     matcher             = 200
   }
 }

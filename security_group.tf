@@ -134,7 +134,7 @@ resource "aws_security_group" "play_worker_sg" {
   }
 
   tags = {
-    Name = "PLAY-WORK-SG-${var.tenant_id}-${var.infrastructure_purpose}"
+    Name        = "PLAY-WORK-SG-${var.tenant_id}-${var.infrastructure_purpose}"
     Environment = var.infrastructure_purpose
   }
 
@@ -152,42 +152,6 @@ resource "aws_security_group" "kurento_worker_sg" {
 
   lifecycle {
     create_before_destroy = true
-  }
-
-
-  // port range is required for turn server
-  ingress {
-    from_port   = 3478
-    to_port     = 3479
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-
-  // port range is required for turn server
-  ingress {
-    from_port   = 3478
-    to_port     = 3479
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-
-  // port range is required for turn server
-  ingress {
-    from_port   = 55000
-    to_port     = 55501
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-
-  // port range is required for turn server
-  ingress {
-    from_port   = 55000
-    to_port     = 55501
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
   }
 
 
@@ -218,12 +182,12 @@ resource "aws_security_group" "kurento_worker_sg" {
     ]
   }
 
-    dynamic "ingress" {
-    for_each = length(var.use_aws_accelerator_ips)>0 ? ["ok"] : []
+  dynamic "ingress" {
+    for_each = length(var.use_aws_accelerator_ips) > 0 ? ["ok"] : []
     content {
-      from_port = 8888
-      to_port   = 8888
-      protocol  = "tcp"
+      from_port       = 8888
+      to_port         = 8888
+      protocol        = "tcp"
       prefix_list_ids = [data.aws_ec2_managed_prefix_list.route53healthchecks.id]
     }
   }
@@ -282,9 +246,9 @@ resource "aws_security_group" "lb_sg" {
   }
 
   ingress {
-    from_port = var.play_listener_port
-    to_port   = var.play_listener_port
-    protocol  = "tcp"
+    from_port   = var.play_listener_port
+    to_port     = var.play_listener_port
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -314,16 +278,16 @@ resource "aws_security_group" "play_lb_sg" {
 
 
   ingress {
-    from_port = var.play_listener_port
-    to_port   = var.play_listener_port
-    protocol  = "tcp"
+    from_port   = var.play_listener_port
+    to_port     = var.play_listener_port
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -342,7 +306,7 @@ resource "aws_security_group" "play_lb_sg" {
 }
 
 resource "aws_security_group" "ssh_access_sg" {
-  count       = length(var.allow_ssh_access_ips)>0 ? 1 : 0
+  count       = length(var.allow_ssh_access_ips) > 0 ? 1 : 0
   vpc_id      = aws_vpc.recording_vpc.id
   name        = "SSH_ACCESS-SG-${var.tenant_id}-${var.infrastructure_purpose}"
   description = "SSH access from whitelisted hosts"
@@ -354,10 +318,10 @@ resource "aws_security_group" "ssh_access_sg" {
 
 
   ingress {
-      from_port = 22
-      to_port   = 22
-      protocol  = "tcp"
-      cidr_blocks = var.allow_ssh_access_ips
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = var.allow_ssh_access_ips
   }
 
   egress {
@@ -371,6 +335,16 @@ resource "aws_security_group" "ssh_access_sg" {
     Name = "SSH_ACCESS-SG-${var.tenant_id}-${var.infrastructure_purpose}"
   }
 
+}
+
+resource "aws_security_group_rule" "turn_rule" {
+  count             = 2
+  type              = "ingress"
+  from_port         = 3478
+  to_port           = 3479
+  protocol          = (count.index % 2) > 0 ? "tcp" : "udp"
+  cidr_blocks       = local.use_turn_nodes ? ["0.0.0.0/0"] : [for ip in(length(aws_eip.eip) > 0 ? aws_eip.eip.*.public_ip : aws_instance.kurento_worker.*.public_ip) : "${ip}/32"]
+  security_group_id = aws_security_group.kurento_worker_sg.id
 }
 
 data "aws_ec2_managed_prefix_list" "route53healthchecks" {

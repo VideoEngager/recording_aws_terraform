@@ -45,7 +45,14 @@ set -a; source /etc/profile.d/load_env.sh; set +a
 echo "Render turnserver config file"
 envsubst '$COTURN_LISTENER_PORT,$COTURN_ALT_LISTENER_PORT,$EXTERNAL_IP,$INTERNAL_IP,$TURN_SERVER_USERNAME,$TURN_SERVER_PASSWORD,$TURN_SERVER_MIN_PORT,$TURN_SERVER_MAX_PORT' < /home/ubuntu/turnserver-template.conf | sudo tee /etc/turnserver.conf
 envsubst '$COTURN_LISTENER_PORT,$EXTERNAL_IP,$TURN_SERVER_USERNAME,$TURN_SERVER_PASSWORD' < /home/ubuntu/launch-kms-tempate.sh | sudo tee /usr/local/bin/launch-kms.sh
-sudo chmod 755 /usr/local/bin/launch-kms.sh
+sudo touch /var/log/turnserver/turnserver.log
+sudo chmod 777 /var/log/turnserver/turnserver.log
+
+echo "turnURL=$TURN_SERVER_USERNAME:$TURN_SERVER_PASSWORD@$EXTERNAL_IP:$COTURN_LISTENER_PORT" > /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
+echo "externalIPv4=$EXTERNAL_IP" >> /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
+echo "iceTcp=0" >> /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
+echo "minPort=$TURN_SERVER_MIN_PORT" >> /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini
+echo "maxPort=$TURN_SERVER_MAX_PORT" >> /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini
 
 
 
@@ -69,4 +76,7 @@ sudo chmod 777 "$MEDIA_DIR"
 sudo su -c "echo \"$EFS\":/ \"$MEDIA_DIR\" nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0 >> /etc/fstab"
 
 echo "Launching Media Server..."
-sudo /usr/local/bin/launch-kms.sh
+sudo systemctl stop kms
+sudo systemctl stop coturn
+sudo systemctl start kms
+sudo systemctl start coturn

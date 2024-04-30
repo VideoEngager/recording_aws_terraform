@@ -47,6 +47,7 @@ envsubst '$COTURN_LISTENER_PORT,$COTURN_ALT_LISTENER_PORT,$EXTERNAL_IP,$INTERNAL
 if [ -n "$KURENTO_HOST_IP" ]; then
     echo "turnURL=$TURN_SERVER_USERNAME:$TURN_SERVER_PASSWORD@$EXTERNAL_IP:$COTURN_LISTENER_PORT" > /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
     echo "externalIPv4=$KURENTO_HOST_IP" >> /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
+    echo "iceTcp=0" >> /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
     echo "minPort=$TURN_SERVER_MIN_PORT" >> /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini
     echo "maxPort=$TURN_SERVER_MAX_PORT" >> /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini
 fi
