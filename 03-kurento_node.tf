@@ -1,12 +1,12 @@
-locals {  
-  kurento_instance_names = var.use_docker_workers ? [] : [for a in range(local.kurento_nodes):"KurentoWorker-${a+1}-${var.tenant_id}-${try(data.aws_ami.kurento_worker_ami[0].tags["Version"],var.ami_version)}"]
+locals {
+  kurento_instance_names = var.use_docker_workers ? [] : [for a in range(local.kurento_nodes) : "KurentoWorker-${a + 1}-${var.tenant_id}-${try(data.aws_ami.kurento_worker_ami[0].tags["Version"], var.ami_version)}"]
 }
 
 
 data "aws_ami" "kurento_worker_ami" {
   most_recent = true
   owners      = ["376474804475"]
-  count = var.use_docker_workers ? 0 : 1
+  count       = var.use_docker_workers ? 0 : 1
   filter {
     name = "name"
     values = [
@@ -14,7 +14,7 @@ data "aws_ami" "kurento_worker_ami" {
     ]
   }
 
-  
+
   # filter {
   #   name = local.getLatest ? "tag-key" : "tag:Version"
   #   values = [
@@ -26,7 +26,7 @@ data "aws_ami" "kurento_worker_ami" {
 
 
 data "template_file" "kurento_worker_init" {
-  count = var.use_docker_workers ? 0 : local.kurento_nodes
+  count    = var.use_docker_workers ? 0 : local.kurento_nodes
   template = local.use_turn_nodes ? file("./config/kurento-noturn-worker-init.tpl") : file("./config/kurento-worker-init.tpl")
   vars = {
     kurento_service_log_file_path = "/var/log/kurento-media-server/*.log"
@@ -44,8 +44,8 @@ data "template_file" "kurento_worker_init" {
     turn_server_password     = random_password.password.result
     turn_server_min_port     = var.min_port
     turn_server_max_port     = var.max_port
-    turn_internal_ip         = local.use_turn_nodes ? local.turn_nodes_private_ips[(count.index%2==0) ? 0 : 1] : "127.0.0.1"
-    kurento_host_ip          = local.use_turn_nodes ? var.use_aws_accelerator_ips[(count.index%2==0) ? 0 : 1] : ""
+    turn_internal_ip         = local.use_turn_nodes ? local.turn_nodes_private_ips[(count.index % 2 == 0) ? 0 : 1] : "127.0.0.1"
+    kurento_host_ip          = local.use_turn_nodes ? var.use_aws_accelerator_ips[(count.index % 2 == 0) ? 0 : 1] : ""
 
     kurento_aws_monitoring_access_key = var.kurento_monitoring_aws_access_key
     kurento_aws_monitoring_secret_key = var.kurento_monitoring_aws_secret_key
@@ -61,7 +61,7 @@ data "template_file" "kurento_worker_init" {
 }
 
 resource "aws_eip_association" "eip_assoc" {
-  count         = (!local.use_turn_nodes && var.use_elastic_ip && !var.use_docker_workers) ? local.kurento_nodes : 0
+  count = (!local.use_turn_nodes && var.use_elastic_ip && !var.use_docker_workers) ? local.kurento_nodes : 0
   # count  = 2 
   instance_id   = aws_instance.kurento_worker[count.index].id
   allocation_id = aws_eip.eip[count.index].id
@@ -72,7 +72,7 @@ resource "aws_instance" "kurento_worker" {
   count                = var.use_docker_workers ? 0 : local.kurento_nodes
   ami                  = data.aws_ami.kurento_worker_ami[0].id
   instance_type        = var.ec2_type
-  subnet_id            = (count.index % 2 == 0 ? (local.use_turn_nodes ? aws_subnet.main-private-1.id : aws_subnet.main-public-1.id) : (local.use_turn_nodes ? aws_subnet.main-private-2.id : aws_subnet.main-public-2.id) )
+  subnet_id            = (count.index % 2 == 0 ? (local.use_turn_nodes ? aws_subnet.main-private-1.id : aws_subnet.main-public-1.id) : (local.use_turn_nodes ? aws_subnet.main-private-2.id : aws_subnet.main-public-2.id))
   iam_instance_profile = aws_iam_instance_profile.CloudWatch_Profile.name
   private_ip           = local.use_turn_nodes ? null : local.kurento_nodes_private_ips[count.index]
   user_data            = data.template_file.kurento_worker_init[count.index].rendered
@@ -95,7 +95,7 @@ resource "aws_instance" "kurento_worker" {
     aws_security_group.ssh_access_sg.*.id
   )
 
-  
+
 
   depends_on = [
     aws_efs_file_system.recording-efs,

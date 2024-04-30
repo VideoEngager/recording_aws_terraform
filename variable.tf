@@ -1,8 +1,8 @@
 variable "access_key" {
-  type    = string
+  type = string
 }
 variable "secret_key" {
-  type    = string
+  type = string
 }
 
 variable "kurento_monitoring_aws_access_key" {
@@ -15,7 +15,7 @@ variable "kurento_monitoring_aws_secret_key" {
 }
 
 variable "deployment_region" {
-  type    = string
+  type = string
 }
 variable "availability_zone_1" {
   default = "a"
@@ -71,7 +71,7 @@ variable "infrastructure_purpose" {
 }
 
 variable "isEFSEncrypted" {
-  type    = bool
+  type        = bool
   default     = true
   description = "Controls the encryption of data at rest. If true, the disk will be encrypted."
 }
@@ -138,14 +138,14 @@ variable "reporter_path" {
 
 
 variable "min_port" {
-  type    = number
+  type        = number
   default     = 55002
   description = "Lower bound of the UDP port range for relay endpoints allocation."
 }
 
 
 variable "max_port" {
-  type    = number
+  type        = number
   default     = 65535
   description = "Upper bound of the UDP port range for relay endpoints allocation."
 }
@@ -169,7 +169,7 @@ variable "play_listener_port" {
 }
 
 variable "vpc_cidr_block" {
-  type    = string
+  type = string
 }
 variable "cidr_block_recording_gateway" {
   type    = string
@@ -183,7 +183,7 @@ variable "csi_vpc_id" {
 
 
 variable "controlling_vpc_cidr_block" {
-  type    = string
+  type        = string
   default     = "10.77.0.0/16"
   description = "VPC CIRD for SmartVideo Controlling Infrastructure"
 }
@@ -191,7 +191,7 @@ variable "controlling_vpc_cidr_block" {
 
 
 variable "csi_prod_deployment_region" {
-  type    = string
+  type        = string
   default     = "us-west-2"
   description = "Deployment region of the signaling and controling infrastructure"
 
@@ -211,8 +211,8 @@ variable "cloudwatch_kurento_worker_log_name" {
 }
 
 
-variable "aws_account_id" { 
-  type    = string
+variable "aws_account_id" {
+  type = string
 }
 
 
@@ -228,26 +228,26 @@ variable "s3_bucket_force_destroy" {
 }
 
 variable "use_private_link" {
-  default = false
-  type = bool
+  default     = false
+  type        = bool
   description = "if true usage of AWS Private Link instead of VPC Peering"
 }
 
 variable "use_elastic_ip" {
-  default = false
-  type = bool
+  default     = false
+  type        = bool
   description = "if true usage of Elastic IP addresses of kurento nodes"
 }
 
 variable "use_docker_workers" {
-  default = false
-  type = bool
+  default     = false
+  type        = bool
   description = "if true usage of Docker instance nodes"
 }
 
 variable "aws_ecr_docker_token" {
-  default = ""
-  type = string
+  default     = ""
+  type        = string
   description = "Temporary token used for docker login to AWS ECR service"
 }
 
@@ -262,26 +262,26 @@ variable "docker_ec2_type" {
 }
 
 variable "use_play_service" {
-  default = false
-  type = bool
+  default     = false
+  type        = bool
   description = "if true add play service insance/s"
 }
 
 variable "play_service_cert_arn" {
-  default = ""
-  type = string
+  default     = ""
+  type        = string
   description = "If in use .. add https support for play load balancer otherwise uses http"
 }
 
-variable "custom_efs_address"{
-  default = ""
-  type = string
+variable "custom_efs_address" {
+  default     = ""
+  type        = string
   description = "If in use .. do not create efs .. use provided in value one"
 }
 
 variable "kurento_nodes_count" {
   default = 1
-  type = number
+  type    = number
   validation {
     condition     = var.kurento_nodes_count < 20
     error_message = "The value of kurento_nodes_count must be less than 20."
@@ -290,7 +290,7 @@ variable "kurento_nodes_count" {
 
 variable "processing_nodes_count" {
   default = 1
-  type = number
+  type    = number
   validation {
     condition     = var.processing_nodes_count < 20
     error_message = "The value of processing_nodes_count must be less than 20."
@@ -299,7 +299,7 @@ variable "processing_nodes_count" {
 
 variable "play_nodes_count" {
   default = 1
-  type = number
+  type    = number
   validation {
     condition     = var.play_nodes_count < 20
     error_message = "The value of play_nodes_count must be less than 20."
@@ -307,8 +307,8 @@ variable "play_nodes_count" {
 }
 
 variable "use_separate_turn_service" {
-  default = false
-  type = bool
+  default     = false
+  type        = bool
   description = "if true creates pair of coturn ec2 instances"
 }
 
@@ -317,31 +317,31 @@ variable "turn_ec2_type" {
 }
 
 variable "remote_efs_address" {
-  default = null
-  type = string
+  default     = null
+  type        = string
   description = "if not null app uses this filesystem to store final recording files.Please note that you must use different values for media_input_mount_dir and media_output_mount_dir "
 }
 
 variable "use_archiver_service" {
-  default = false
-  type = bool
+  default     = false
+  type        = bool
   description = "if true enables archiver service"
 }
 
 variable "ami_version" {
-  default = "latest"
-  type = string
+  default     = "latest"
+  type        = string
   description = "Recording version to install"
 }
 
 variable "use_aws_accelerator_ips" {
-  default = []
-  type = list(string)
+  default     = []
+  type        = list(string)
   description = "if in use will place separate kurento instances in private availability groups and add ips as kurento's externalIPv4 param."
 }
 
 variable "allow_ssh_access_ips" {
-  default = []
-  type = list(string)
+  default     = []
+  type        = list(string)
   description = "If set allows ssh access from provided list of ip addresses, Example 10.11.12.13/32 to allow 10.11.12.13 ip ssh access. "
 }

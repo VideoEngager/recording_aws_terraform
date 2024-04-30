@@ -1,5 +1,5 @@
 locals {
-  play_https = var.play_service_cert_arn != null && var.play_service_cert_arn != "" && length(var.play_service_cert_arn)>5
+  play_https = var.play_service_cert_arn != null && var.play_service_cert_arn != "" && length(var.play_service_cert_arn) > 5
 }
 
 resource "aws_lb" "play_load_balancer" {
@@ -58,7 +58,7 @@ resource "aws_lb_target_group" "play_target_group" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 5
-    interval            = 30  
+    interval            = 30
     matcher             = 200
   }
 }
@@ -79,7 +79,7 @@ resource "aws_lb_listener" "play_listener" {
 }
 
 resource "aws_lb_listener_certificate" "lb_play_certificate" {
-  count = (!var.use_play_service || !local.play_https) ? 0 : 1
+  count           = (!var.use_play_service || !local.play_https) ? 0 : 1
   listener_arn    = aws_lb_listener.play_listener[0].arn
   certificate_arn = var.play_service_cert_arn
 }

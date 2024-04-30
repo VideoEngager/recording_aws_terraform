@@ -31,7 +31,7 @@ resource "aws_cloudwatch_log_group" "kurento_log_group" {
   name              = "/kurento-${var.tenant_id}-${var.infrastructure_purpose}/"
   retention_in_days = 30
 
-  
+
   tags = {
     Environment = var.infrastructure_purpose
     Application = "KurentoWorkers-${var.tenant_id}-${var.infrastructure_purpose}"
@@ -42,13 +42,13 @@ resource "aws_cloudwatch_log_group" "kurento_log_group" {
 
 resource "aws_cloudwatch_log_stream" "kurento_log_streams" {
   count          = local.kurento_nodes
-  name           = "logs-kurento-worker-${count.index+1}"
+  name           = "logs-kurento-worker-${count.index + 1}"
   log_group_name = aws_cloudwatch_log_group.kurento_log_group.name
 }
 
 resource "aws_cloudwatch_log_stream" "coturn_log_streams" {
-  count          = local.use_turn_nodes ? local.turn_nodes : local.kurento_nodes 
-  name           = "logs-coturn-for-kurento-worker-${count.index+1}"
+  count          = local.use_turn_nodes ? local.turn_nodes : local.kurento_nodes
+  name           = "logs-coturn-for-kurento-worker-${count.index + 1}"
   log_group_name = aws_cloudwatch_log_group.kurento_log_group.name
 }
 
@@ -74,19 +74,19 @@ resource "aws_cloudwatch_log_group" "playsvc_log_group" {
 
 resource "aws_cloudwatch_log_stream" "recsvc_log_stream_processing_units" {
   count          = local.processing_nodes
-  name           = "logs-processing-worker-${count.index+1}"
+  name           = "logs-processing-worker-${count.index + 1}"
   log_group_name = aws_cloudwatch_log_group.recsvc_log_group.name
 }
 
 resource "aws_cloudwatch_log_stream" "playsvc_log_stream_processing_units" {
   count          = local.play_nodes
-  name           = "logs-play-worker-${count.index+1}"
+  name           = "logs-play-worker-${count.index + 1}"
   log_group_name = aws_cloudwatch_log_group.playsvc_log_group.name
 }
 
 resource "aws_cloudwatch_log_stream" "recsvc_log_stream_archiver_units" {
   count          = local.processing_nodes
-  name           = "logs-archiver-worker-${count.index+1}"
+  name           = "logs-archiver-worker-${count.index + 1}"
   log_group_name = aws_cloudwatch_log_group.recsvc_log_group.name
 }
 
@@ -138,10 +138,10 @@ resource "aws_cloudwatch_metric_alarm" "target-unhealthy-count" {
 
 
 resource "aws_sns_topic" "kurento_target_group_unhealthy" {
-  name              = "shared_rec_kurento_target_group_has_unhealthy_host" 
+  name = "shared_rec_kurento_target_group_has_unhealthy_host"
 }
 
 
 resource "aws_sns_topic" "kurento_target_group_healthy" {
-  name              = "shared_rec_kurento_target_group_all_hosts_healthy"  
+  name = "shared_rec_kurento_target_group_all_hosts_healthy"
 }

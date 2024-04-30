@@ -1,9 +1,9 @@
-aws_account_id=""
-access_key=""
-secret_key=""
+aws_account_id = ""
+access_key     = ""
+secret_key     = ""
 
 deployment_region = ""
-vpc_cidr_block ="X.X.X.X/16"
+vpc_cidr_block    = "X.X.X.X/16"
 
 # [optional variables]
 #

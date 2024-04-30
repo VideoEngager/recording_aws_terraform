@@ -2,8 +2,8 @@
 resource "aws_vpc_peering_connection" "peer" {
   count         = var.use_private_link ? 0 : 1
   vpc_id        = aws_vpc.recording_vpc.id
-  peer_vpc_id   = var.csi_vpc_id 
-  peer_owner_id = "376474804475"  
+  peer_vpc_id   = var.csi_vpc_id
+  peer_owner_id = "376474804475"
   peer_region   = var.csi_prod_deployment_region
   auto_accept   = false
 
@@ -13,7 +13,7 @@ resource "aws_vpc_peering_connection" "peer" {
   }
 
   # lifecycle {
-  #   ignore_changes        = [tags,peer_region,peer_vpc_id,vpc_id]
+  #   ignore_changes = [tags, peer_region, peer_vpc_id, vpc_id]
   # }
 
 }
@@ -23,7 +23,8 @@ resource "aws_vpc_peering_connection" "peer" {
 
 # Create a route to Main VPC route table
 resource "aws_route" "main_peer_access" {
-  count                     = var.use_private_link ? 0 : 1
+  count = var.use_private_link ? 0 : 1
+
   route_table_id            = aws_route_table.recording_public.id
   destination_cidr_block    = var.controlling_vpc_cidr_block
   vpc_peering_connection_id = aws_vpc_peering_connection.peer[count.index].id
