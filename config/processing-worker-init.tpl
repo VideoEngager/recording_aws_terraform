@@ -14,7 +14,7 @@ touch /etc/profile.d/load_env.sh
     echo "export RECSVC_LISTEN_PORT=\"${recsvc_listen_port}\""
     echo "export MIXER_TOOL=\"${mixer_tool}\""
 
-    echo "export MIXER_OUTDIR=\"${media_input_dir}${media_mixer_dir}\""
+    echo "export MIXER_OUTDIR=\"/tmp\""
     echo "export UPLOADER_PATH=\"${media_output_dir}${media_file_ready_dir}\""
     # echo "export MIXER_OUTDIR=\"$MEDIA_DIR$MEDIA_MIXER_DIR\"" >> /etc/profile.d/load_env.sh
     # echo "export UPLOADER_PATH=\"$MEDIA_DIR$MEDIA_FILE_READY_DIR\"" >> /etc/profile.d/load_env.sh
