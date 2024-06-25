@@ -47,12 +47,6 @@ resource "aws_lb" "recording_load_balancer" {
   idle_timeout = 900
   // enable_deletion_protection = true
 
-  access_logs {
-    bucket  = aws_s3_bucket.recording_logs.bucket
-    prefix  = var.lb_prefix
-    enabled = true
-  }
-
   tags = {
     Name        = "RecordingLoadBalancer-${var.infrastructure_purpose}"
     Environment = var.infrastructure_purpose

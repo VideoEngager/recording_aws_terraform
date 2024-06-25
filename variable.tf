@@ -181,6 +181,11 @@ variable "csi_vpc_id" {
   default = "vpc-0f1ceef6cafda43b9"
 }
 
+variable "csi_account" {
+  type    = string
+  default = "376474804475"
+}
+
 
 variable "controlling_vpc_cidr_block" {
   type        = string

@@ -3,7 +3,7 @@ resource "aws_vpc_peering_connection" "peer" {
   count         = var.use_private_link ? 0 : 1
   vpc_id        = aws_vpc.recording_vpc.id
   peer_vpc_id   = var.csi_vpc_id
-  peer_owner_id = "376474804475"
+  peer_owner_id = var.csi_account
   peer_region   = var.csi_prod_deployment_region
   auto_accept   = false
 
