@@ -26,12 +26,6 @@ resource "aws_lb" "private_link" {
     aws_subnet.main-public-2.id
   ]
 
-  access_logs {
-    bucket  = aws_s3_bucket.recording_logs.bucket
-    prefix  = "pl-nlb-log"
-    enabled = true
-  }
-
   tags = {
     Name        = "rec-private-link-nlb-${var.tenant_id}-${var.infrastructure_purpose}"
     Environment = var.infrastructure_purpose

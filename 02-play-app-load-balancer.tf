@@ -18,12 +18,6 @@ resource "aws_lb" "play_load_balancer" {
   idle_timeout = 900
   // enable_deletion_protection = true
 
-  access_logs {
-    bucket  = aws_s3_bucket.recording_logs.bucket
-    prefix  = "Play-${var.lb_prefix}"
-    enabled = true
-  }
-
   tags = {
     Name        = "RecordingPlayLoadBalancer-${var.tenant_id}"
     Environment = var.infrastructure_purpose
