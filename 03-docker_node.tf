@@ -115,3 +115,10 @@ resource "aws_lb_target_group_attachment" "docker_archiver_target_group_attachme
   target_id        = aws_instance.docker_worker[count.index].id
   port             = var.archiver_service_listen_port
 }
+
+resource "aws_lb_target_group_attachment" "docker_verint_connector_target_group_attachment" {
+  count            = var.use_docker_workers && var.use_verint_connector_service ? local.kurento_nodes : 0
+  target_group_arn = aws_lb_target_group.verint_connector_target_group[0].arn
+  target_id        = aws_instance.docker_worker[count.index].id
+  port             = var.verint_connector_listen_port
+}

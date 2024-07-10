@@ -197,3 +197,45 @@ resource "aws_lb_target_group_attachment" "private_link_archive" {
     aws_lb_target_group.private_link_archive
   ]
 }
+
+resource "aws_lb_listener" "private_link_verint_connector" {
+  count             = (var.use_private_link && var.use_verint_connector_service) ? 1 : 0
+  load_balancer_arn = aws_lb.private_link[count.index].arn
+  port              = var.verint_connector_listen_port
+  protocol          = "TCP"
+
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.private_link_verint_connector[count.index].arn
+  }
+}
+
+resource "aws_lb_target_group" "private_link_verint_connector" {
+  count       = (var.use_private_link && var.use_verint_connector_service) ? 1 : 0
+  name        = "pl-verintconn-tg-${var.tenant_id}-${var.infrastructure_purpose}"
+  port        = var.verint_connector_listen_port
+  protocol    = "TCP"
+  target_type = "alb"
+  vpc_id      = aws_vpc.recording_vpc.id
+
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes        = [name]
+  }
+
+}
+
+resource "aws_lb_target_group_attachment" "private_link_verint_connector" {
+  count            = (var.use_private_link && var.use_verint_connector_service) ? 1 : 0
+  target_group_arn = aws_lb_target_group.private_link_verint_connector[count.index].arn
+  target_id        = aws_lb.recording_load_balancer.arn
+  port             = var.verint_connector_listen_port
+
+  depends_on = [
+    aws_lb_listener.private_link_verint_connector,
+    aws_lb.recording_load_balancer,
+    aws_lb_target_group.private_link_verint_connector
+  ]
+}
+
