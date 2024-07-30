@@ -100,7 +100,16 @@ resource "aws_security_group" "processing_worker_sg" {
       local.cidr_block_subnet_public_1,
       local.cidr_block_subnet_public_2
     ]
+  }
 
+  ingress {
+    from_port = var.aws_transcribe_listen_port
+    to_port   = var.aws_transcribe_listen_port
+    protocol  = "tcp"
+    cidr_blocks = [
+      local.cidr_block_subnet_public_1,
+      local.cidr_block_subnet_public_2
+    ]
   }
 
   egress {
@@ -240,6 +249,15 @@ resource "aws_security_group" "lb_sg" {
   ingress {
     from_port = var.verint_connector_listen_port
     to_port   = var.verint_connector_listen_port
+    protocol  = "tcp"
+    cidr_blocks = [
+      var.use_private_link ? var.vpc_cidr_block : var.controlling_vpc_cidr_block
+    ]
+  }
+
+  ingress {
+    from_port = var.aws_transcribe_listen_port
+    to_port   = var.aws_transcribe_listen_port
     protocol  = "tcp"
     cidr_blocks = [
       var.use_private_link ? var.vpc_cidr_block : var.controlling_vpc_cidr_block

@@ -96,7 +96,11 @@ resource "aws_cloudwatch_log_stream" "recsvc_log_stream_verint_connector_units" 
   log_group_name = aws_cloudwatch_log_group.recsvc_log_group.name
 }
 
-
+resource "aws_cloudwatch_log_stream" "recsvc_log_stream_aws_transcribe_units" {
+  count          = local.processing_nodes
+  name           = "logs-aws-transcribe-worker-${count.index + 1}"
+  log_group_name = aws_cloudwatch_log_group.recsvc_log_group.name
+}
 
 /******* Specify log metrics ********/
 

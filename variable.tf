@@ -361,3 +361,14 @@ variable "verint_connector_listen_port" {
   type = number
   default = 7005
 }
+
+variable "use_aws_transcribe_service" {
+  default     = false
+  type        = bool
+  description = "if true enables AWS transcribe service"
+}
+
+variable "aws_transcribe_listen_port" {
+  type = number
+  default = 7006
+}

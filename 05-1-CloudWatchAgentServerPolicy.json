@@ -16,7 +16,10 @@
                 "s3:GetObject",
                 "s3:RestoreObject",
                 "s3:ListBucket",
-                "s3:ListJobs"
+                "s3:ListJobs",
+                "transcribe:StartTranscriptionJob",
+                "transcribe:ListTranscriptionJobs",
+                "transcribe:DeleteTranscriptionJob"
             ],
             "Resource": "*"
         },

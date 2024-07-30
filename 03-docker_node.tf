@@ -122,3 +122,10 @@ resource "aws_lb_target_group_attachment" "docker_verint_connector_target_group_
   target_id        = aws_instance.docker_worker[count.index].id
   port             = var.verint_connector_listen_port
 }
+
+resource "aws_lb_target_group_attachment" "docker_aws_transcribe_target_group_attachment" {
+  count            = var.use_docker_workers && var.use_aws_transcribe_service ? local.kurento_nodes : 0
+  target_group_arn = aws_lb_target_group.aws_transcribe_target_group[0].arn
+  target_id        = aws_instance.docker_worker[count.index].id
+  port             = var.aws_transcribe_listen_port
+}

@@ -4,8 +4,8 @@ sleep 30
 touch /etc/profile.d/load_env.sh
 
 {
-    echo "export PLAYBACK_BASE_URL=\"${reporter_url}\""
-    echo "export UPLOADER_PATH=\"${media_output_dir}${media_file_ready_dir}\""  
+    echo "export PLAYSVC_BASE_URL=\"${reporter_url}\""
+    echo "export PLAYSVC_UPLOADER_PATH=\"${media_output_dir}${media_file_ready_dir}\""  
     echo "export PLAYSVC_LISTEN_PORT=\"${playsvc_listen_port}\""
 
     echo "export EFS=\"${efs_dns_name}\""
@@ -29,7 +29,7 @@ set -a; source /etc/profile.d/load_env.sh; set +a
 
 echo "Render Playsvc config file"
 sudo systemctl stop playsvc.service
-envsubst '$PLAYBACK_BASE_URL,$UPLOADER_PATH,$PLAYSVC_LISTEN_PORT' < /playsvc/config_template.json | sudo tee /playsvc/config.json
+envsubst '$PLAYSVC_BASE_URL,$PLAYSVC_UPLOADER_PATH,$PLAYSVC_LISTEN_PORT' < /playsvc/config_template.json | sudo tee /playsvc/config.json
 
 
 echo "Render Cloudwatch Config file and start service"
