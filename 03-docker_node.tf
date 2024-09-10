@@ -5,6 +5,7 @@ locals {
 
 
 data "aws_ami" "worker_ami_centos" {
+  count    = var.use_docker_workers ? 1 : 0
   most_recent = true
   owners      = ["aws-marketplace"]
 
@@ -19,7 +20,7 @@ data "aws_ami" "worker_ami_centos" {
 
 
 data "template_file" "docker_worker_init" {
-  count    = local.kurento_nodes
+  count    = var.use_docker_workers ? local.kurento_nodes : 0
   template = file("./config/docker-centos7-worker-init.tpl")
   vars = {
     playback_base_url = local.reporter_docker_play_url
@@ -49,7 +50,7 @@ resource "aws_eip_association" "docker_eip_assoc" {
 
 resource "aws_instance" "docker_worker" {
   count                = var.use_docker_workers ? local.kurento_nodes : 0
-  ami                  = data.aws_ami.worker_ami_centos.id
+  ami                  = data.aws_ami.worker_ami_centos.0.id
   instance_type        = var.docker_ec2_type
   subnet_id            = (count.index % 2 == 0 ? aws_subnet.main-public-1.id : aws_subnet.main-public-2.id)
   iam_instance_profile = aws_iam_instance_profile.CloudWatch_Profile.name
