@@ -56,6 +56,18 @@ data "template_file" "processing_worker_init" {
     archiver_log_stream_name = aws_cloudwatch_log_stream.recsvc_log_stream_archiver_units[count.index].name
     archiver_log_file_path   = "/var/log/archivesvc/logs.log"
     archiver_base_url        = local.reporter_archiver_url
+
+    use_verint_connector             = var.use_verint_connector_service
+    verint_connector_listen_port     = var.verint_connector_listen_port
+    verint_connector_log_stream_name = aws_cloudwatch_log_stream.recsvc_log_stream_verint_connector_units[count.index].name
+    verint_connector_log_file_path   = "/var/log/verintconnsvc/logs.log"
+    verint_connector_base_url        = local.reporter_archiver_url
+
+    use_aws_transcribe             = var.use_aws_transcribe_service
+    aws_transcribe_listen_port     = var.aws_transcribe_listen_port
+    aws_transcribe_log_stream_name = aws_cloudwatch_log_stream.recsvc_log_stream_aws_transcribe_units[count.index].name
+    aws_transcribe_log_file_path   = "/var/log/awstranscr/logs.log"
+    aws_transcribe_base_url        = local.reporter_archiver_url
   }
 }
 
@@ -119,4 +131,18 @@ resource "aws_lb_target_group_attachment" "archiver_target_group_attachment" {
   target_group_arn = aws_lb_target_group.archiver_target_group[0].arn
   target_id        = aws_instance.processing_worker[count.index].id
   port             = var.archiver_service_listen_port
+}
+
+resource "aws_lb_target_group_attachment" "verint_connector_target_group_attachment" {
+  count            = (var.use_verint_connector_service && !var.use_docker_workers) ? local.processing_nodes : 0
+  target_group_arn = aws_lb_target_group.verint_connector_target_group[0].arn
+  target_id        = aws_instance.processing_worker[count.index].id
+  port             = var.verint_connector_listen_port
+}
+
+resource "aws_lb_target_group_attachment" "aws_transcribe_target_group_attachment" {
+  count            = (var.use_aws_transcribe_service && !var.use_docker_workers) ? local.processing_nodes : 0
+  target_group_arn = aws_lb_target_group.aws_transcribe_target_group[0].arn
+  target_id        = aws_instance.processing_worker[count.index].id
+  port             = var.aws_transcribe_listen_port
 }

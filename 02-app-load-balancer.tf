@@ -232,3 +232,129 @@ resource "aws_lb_listener_rule" "archiver_rule" {
 
   }
 }
+
+resource "aws_lb_target_group" "verint_connector_target_group" {
+  count    = var.use_verint_connector_service ? 1 : 0
+  name     = "verintcntg-${var.tenant_id}-${var.infrastructure_purpose}"
+  port     = var.verint_connector_listen_port
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.recording_vpc.id
+
+
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes        = [name]
+  }
+
+
+  stickiness {
+    type            = "lb_cookie"
+    cookie_duration = 86400
+    enabled         = true
+
+  }
+
+  health_check {
+    enabled             = "true"
+    protocol            = "HTTP"
+    path                = "/health"
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+    interval            = 30
+    matcher             = 200
+  }
+}
+
+resource "aws_lb_listener" "verint_connector_listener" {
+  count             = var.use_verint_connector_service ? 1 : 0
+  load_balancer_arn = aws_lb.recording_load_balancer.arn
+  port              = var.verint_connector_listen_port
+
+  protocol = "HTTP"
+
+  default_action {
+    target_group_arn = aws_lb_target_group.verint_connector_target_group[0].arn
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener_rule" "verint_connector_rule" {
+  count        = var.use_verint_connector_service ? 1 : 0
+  listener_arn = aws_lb_listener.verint_connector_listener[0].arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.verint_connector_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/"]
+    }
+  }
+}
+
+resource "aws_lb_target_group" "aws_transcribe_target_group" {
+  count    = var.use_aws_transcribe_service ? 1 : 0
+  name     = "awstrnc-${var.tenant_id}-${var.infrastructure_purpose}"
+  port     = var.aws_transcribe_listen_port
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.recording_vpc.id
+
+
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes        = [name]
+  }
+
+
+  stickiness {
+    type            = "lb_cookie"
+    cookie_duration = 86400
+    enabled         = true
+
+  }
+
+  health_check {
+    enabled             = "true"
+    protocol            = "HTTP"
+    path                = "/health"
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+    interval            = 30
+    matcher             = 200
+  }
+}
+
+resource "aws_lb_listener" "aws_transcribe_listener" {
+  count             = var.use_aws_transcribe_service ? 1 : 0
+  load_balancer_arn = aws_lb.recording_load_balancer.arn
+  port              = var.aws_transcribe_listen_port
+
+  protocol = "HTTP"
+
+  default_action {
+    target_group_arn = aws_lb_target_group.aws_transcribe_target_group[0].arn
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener_rule" "aws_transcribe_rule" {
+  count        = var.use_aws_transcribe_service ? 1 : 0
+  listener_arn = aws_lb_listener.aws_transcribe_listener[0].arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.aws_transcribe_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/"]
+    }
+  }
+}

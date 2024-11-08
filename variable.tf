@@ -350,3 +350,25 @@ variable "allow_ssh_access_ips" {
   type        = list(string)
   description = "If set allows ssh access from provided list of ip addresses, Example 10.11.12.13/32 to allow 10.11.12.13 ip ssh access. "
 }
+
+variable "use_verint_connector_service" {
+  default     = false
+  type        = bool
+  description = "if true enables verint connector service"
+}
+
+variable "verint_connector_listen_port" {
+  type = number
+  default = 7005
+}
+
+variable "use_aws_transcribe_service" {
+  default     = false
+  type        = bool
+  description = "if true enables AWS transcribe service"
+}
+
+variable "aws_transcribe_listen_port" {
+  type = number
+  default = 7006
+}
