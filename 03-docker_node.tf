@@ -7,21 +7,20 @@ locals {
 data "aws_ami" "worker_ami_centos" {
   count    = var.use_docker_workers ? 1 : 0
   most_recent = true
-  owners      = ["aws-marketplace"]
+  owners      = ["137112412989"]
 
   filter {
-    name = "product-code"
+    name = "name"
     values = [
-      "cvugziknvmxgqna9noibqnnsy"
+      "al2023-ami-2023*"
     ]
   }
-
 }
 
 
 data "template_file" "docker_worker_init" {
   count    = var.use_docker_workers ? local.kurento_nodes : 0
-  template = file("./config/docker-centos7-worker-init.tpl")
+  template = file("./config/docker-amazon-linux-worker-init.tpl")
   vars = {
     playback_base_url = local.reporter_docker_play_url
 

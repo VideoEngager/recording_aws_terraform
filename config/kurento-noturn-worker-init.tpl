@@ -68,6 +68,7 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-c
 echo "Mounting EFS volume"
 sudo mkdir -p "$MEDIA_DIR"
 sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport "$EFS":/ "$MEDIA_DIR"
+sudo chown kurento:kurento $(find "$MEDIA_DIR"/* -type d)
 sudo chmod 777 "$MEDIA_DIR"
 sudo su -c "echo \"$EFS\":/ \"$MEDIA_DIR\" nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0 >> /etc/fstab"
 
