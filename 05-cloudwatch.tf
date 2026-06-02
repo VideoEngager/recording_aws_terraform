@@ -12,7 +12,6 @@ resource "aws_iam_role_policy" "CloudWatchAgentPolicy" {
   policy = file("05-1-CloudWatchAgentServerPolicy.json")
 }
 
-
 resource "aws_iam_role" "CloudWatchAgentRole" {
   name = "Recording-${var.tenant_id}-${var.infrastructure_purpose}-${random_string.random_username.result}"
 
@@ -24,8 +23,10 @@ resource "aws_iam_role" "CloudWatchAgentRole" {
   }
 }
 
-
-
+resource "aws_iam_role_policy_attachment" "ssm_access_aws_role" {
+  role       = aws_iam_role.CloudWatchAgentRole.id
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
 
 resource "aws_cloudwatch_log_group" "kurento_log_group" {
   name              = "/kurento-${var.tenant_id}-${var.infrastructure_purpose}/"

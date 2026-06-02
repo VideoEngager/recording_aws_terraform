@@ -68,15 +68,19 @@ resource "aws_lambda_function" "lambda_reboot_instance_on_sns_alarm" {
   filename      = "./lambda_zip/RebootInstanceOnSNSAlarm.zip"
   function_name = "RebootInstanceOnSNSAlarm-${var.tenant_id}-${var.infrastructure_purpose}"
   role          = aws_iam_role.lambda_reboot_instance_on_sns_alarm.arn
-  handler       = "RebootInstanceOnSNSAlarm::RebootInstanceOnSNSAlarm.Function::FunctionHandler"
+  handler       = "index.handler"
 
   source_code_hash = filebase64sha256("./lambda_zip/RebootInstanceOnSNSAlarm.zip")
-  runtime          = "dotnet6"
+  runtime          = "nodejs22.x"
   publish          = true
 
   memory_size = 256
-  timeout     = 20
-
+  timeout     = 120
+  environment {
+    variables = {
+      TARGET_GROUP_ARN = aws_lb_target_group.kurento_target_group.arn
+    }
+  }
 }
 
 
