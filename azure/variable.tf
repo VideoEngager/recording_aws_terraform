@@ -175,3 +175,61 @@ variable "vm_size" {
   default     = "Standard_B1s"
   description = "VM size for kurento and processing instances. Must be available in all deployment availability zones (e.g. Standard_B2ats_v2 when Standard_B1s has capacity restrictions)."
 }
+
+# ---------------------------------------------------------------------------
+# Monitoring / Logging (Azure Monitor - equivalent of AWS CloudWatch)
+# ---------------------------------------------------------------------------
+
+variable "tenant_id" {
+  type        = string
+  default     = "customer"
+  description = "Tenant identifier, used to name Log Analytics custom tables (mirrors the AWS log group naming)."
+}
+
+variable "infrastructure_purpose" {
+  type        = string
+  default     = "prod"
+  description = "Environment purpose (e.g. prod/staging), used to name Log Analytics custom tables and tag resources."
+}
+
+variable "log_retention_in_days" {
+  type        = number
+  default     = 30
+  description = "Retention period (days) for collected logs in the Log Analytics workspace. Mirrors the AWS CloudWatch retention_in_days = 30."
+}
+
+variable "kurento_service_log_file_path" {
+  type        = string
+  default     = "/var/log/kurento-media-server/*.log"
+  description = "Kurento media server log file path/glob collected by the Azure Monitor Agent."
+}
+
+variable "coturn_service_log_file_path" {
+  type        = string
+  default     = "/var/log/turnserver/turnserver.log"
+  description = "Coturn (TURN server) log file path collected by the Azure Monitor Agent."
+}
+
+variable "recsvc_log_file_path" {
+  type        = string
+  default     = "/var/log/recsvc/logs.log"
+  description = "Recording service log file path collected by the Azure Monitor Agent."
+}
+
+variable "archiver_log_file_path" {
+  type        = string
+  default     = "/var/log/archivesvc/logs.log"
+  description = "Archiver service log file path collected by the Azure Monitor Agent."
+}
+
+variable "verint_connector_log_file_path" {
+  type        = string
+  default     = "/var/log/verintconnsvc/logs.log"
+  description = "Verint connector service log file path collected by the Azure Monitor Agent."
+}
+
+variable "aws_transcribe_log_file_path" {
+  type        = string
+  default     = "/var/log/awstranscr/logs.log"
+  description = "Transcribe service log file path collected by the Azure Monitor Agent."
+}

@@ -68,6 +68,10 @@ resource "azurerm_linux_virtual_machine" "processing" {
     azurerm_network_interface.processing_nic[count.index].id,
   ]
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   tags = {
     Version = var.image_tag_version
   }

@@ -68,6 +68,10 @@ resource "azurerm_linux_virtual_machine" "kurento" {
     azurerm_network_interface.kurento_nic[count.index].id,
   ]
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   tags = {
     Version = var.image_tag_version
   }
