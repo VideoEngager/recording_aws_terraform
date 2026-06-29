@@ -5,7 +5,7 @@ variable "resource_prefix" {
 
 variable "location" {
   type    = string
-  default = "West Europe"
+  default = "germanywestcentral"
 }
 
 variable "image_rg_name" {
