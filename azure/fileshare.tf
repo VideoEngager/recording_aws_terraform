@@ -15,7 +15,7 @@ resource "azurerm_storage_account" "sa" {
 resource "azurerm_storage_share" "fs" {
   name               = "recordings-storage"
   storage_account_id = azurerm_storage_account.sa.id
-  quota              = 50
+  quota              = var.fileshare_quota
 }
 
 resource "azurerm_storage_account_network_rules" "sa_rules" {

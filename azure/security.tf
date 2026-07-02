@@ -3,16 +3,20 @@ resource "azurerm_network_security_group" "kurento_nsg" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
-  security_rule {
-    name                       = "Allow-TCP-22-Specific-IP"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
+  dynamic "security_rule" {
+    for_each = length(var.ssh_allowed_cidrs) > 0 ? [1] : []
+    content {
+      name                       = "Allow-TCP-22-Specific-IP"
+      priority                   = 100
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_range     = "22"
+      source_address_prefix      = contains(var.ssh_allowed_cidrs, "*") ? "*" : null
+      source_address_prefixes    = contains(var.ssh_allowed_cidrs, "*") ? null : var.ssh_allowed_cidrs
+      destination_address_prefix = "*"
+    }
   }
 
   security_rule {
@@ -41,7 +45,7 @@ resource "azurerm_network_security_group" "kurento_nsg" {
 }
 
 resource "azurerm_network_interface_security_group_association" "kurento_nsg_assoc" {
-  count                     = local.vm_instance_count
+  count                     = local.kurento_instance_count
   network_interface_id      = azurerm_network_interface.kurento_nic[count.index].id
   network_security_group_id = azurerm_network_security_group.kurento_nsg.id
 }
@@ -56,16 +60,20 @@ resource "azurerm_network_security_group" "processing_nsg" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
-  security_rule {
-    name                       = "Allow-TCP-22-Specific-IP"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
+  dynamic "security_rule" {
+    for_each = length(var.ssh_allowed_cidrs) > 0 ? [1] : []
+    content {
+      name                       = "Allow-TCP-22-Specific-IP"
+      priority                   = 100
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_range     = "22"
+      source_address_prefix      = contains(var.ssh_allowed_cidrs, "*") ? "*" : null
+      source_address_prefixes    = contains(var.ssh_allowed_cidrs, "*") ? null : var.ssh_allowed_cidrs
+      destination_address_prefix = "*"
+    }
   }
 
   security_rule {
@@ -121,7 +129,7 @@ resource "azurerm_network_security_group" "processing_nsg" {
 }
 
 resource "azurerm_network_interface_security_group_association" "processing_nsg_assoc" {
-  count                     = local.vm_instance_count
+  count                     = local.processing_instance_count
   network_interface_id      = azurerm_network_interface.processing_nic[count.index].id
   network_security_group_id = azurerm_network_security_group.processing_nsg.id
 }

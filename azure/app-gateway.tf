@@ -3,6 +3,8 @@
 # ---------------------------------------------------------------------------
 
 locals {
+  appgw_cert_name = "appgw-cert"
+
   appgw_services = concat(
     [
       {
@@ -11,6 +13,7 @@ locals {
         pool       = "kurento"
         probe_path = "/"
         match      = ["426"]
+        protocol   = var.use_ssl_for_app_gateway ? "Https" : "Http"
       },
       {
         key        = "processing"
@@ -18,6 +21,7 @@ locals {
         pool       = "processing"
         probe_path = "/health"
         match      = ["200"]
+        protocol   = var.use_ssl_for_app_gateway ? "Https" : "Http"
       },
     ],
     var.use_archiver_service ? [{
@@ -26,6 +30,7 @@ locals {
       pool       = "processing"
       probe_path = "/health"
       match      = ["200"]
+      protocol   = var.use_ssl_for_app_gateway ? "Https" : "Http"
     }] : [],
     var.use_verint_connector_service ? [{
       key        = "verint"
@@ -33,6 +38,7 @@ locals {
       pool       = "processing"
       probe_path = "/health"
       match      = ["200"]
+      protocol   = var.use_ssl_for_app_gateway ? "Https" : "Http"
     }] : [],
     var.use_aws_transcribe_service ? [{
       key        = "transcribe"
@@ -40,6 +46,7 @@ locals {
       pool       = "processing"
       probe_path = "/health"
       match      = ["200"]
+      protocol   = var.use_ssl_for_app_gateway ? "Https" : "Http"
     }] : [],
   )
 
@@ -136,13 +143,23 @@ resource "azurerm_application_gateway" "recording" {
     }
   }
 
+  dynamic "ssl_certificate" {
+    for_each = var.use_ssl_for_app_gateway ? { (local.appgw_cert_name) = true } : {}
+    content {
+      name     = ssl_certificate.key
+      data     = filebase64("${path.module}/appgatewaycert.pfx")
+      password = var.app_gateway_cert_password
+    }
+  }
+
   dynamic "http_listener" {
     for_each = local.appgw_services_map
     content {
       name                           = "${http_listener.value.key}-listener"
       frontend_ip_configuration_name = "frontend-ip-config"
       frontend_port_name             = "${http_listener.value.key}-port"
-      protocol                       = "Http"
+      protocol                       = http_listener.value.protocol
+      ssl_certificate_name           = http_listener.value.protocol == "Https" ? local.appgw_cert_name : null
     }
   }
 

@@ -28,17 +28,17 @@ data "azurerm_image" "kurento_latest_image" {
 # ---------------------------------------------------------------------------
 
 resource "azurerm_public_ip" "kurento_pip" {
-  count               = local.vm_instance_count
+  count               = local.kurento_instance_count
   name                = "${var.resource_prefix}-kurento-pip-${count.index + 1}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Static"
   sku                 = "Standard"
-  zones               = local.location_supports_zones ? [local.vm_availability_zones[count.index]] : null
+  zones               = local.location_supports_zones ? [local.vm_availability_zones[count.index % length(local.vm_availability_zones)]] : null
 }
 
 resource "azurerm_network_interface" "kurento_nic" {
-  count               = local.vm_instance_count
+  count               = local.kurento_instance_count
   name                = "${var.resource_prefix}-kurento-nic-${count.index + 1}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
@@ -56,13 +56,13 @@ resource "azurerm_network_interface" "kurento_nic" {
 # ---------------------------------------------------------------------------
 
 resource "azurerm_linux_virtual_machine" "kurento" {
-  count               = local.vm_instance_count
+  count               = local.kurento_instance_count
   name                = "${var.resource_prefix}-kurento-${count.index + 1}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  size                = var.vm_size
+  size                = var.kurento_vm_size
   admin_username      = "ubuntu"
-  zone                = local.location_supports_zones ? local.vm_availability_zones[count.index] : null
+  zone                = local.location_supports_zones ? local.vm_availability_zones[count.index % length(local.vm_availability_zones)] : null
 
   network_interface_ids = [
     azurerm_network_interface.kurento_nic[count.index].id,

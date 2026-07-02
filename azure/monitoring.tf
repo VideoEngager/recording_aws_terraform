@@ -262,7 +262,7 @@ resource "azurerm_monitor_data_collection_rule" "processing" {
 # ---------------------------------------------------------------------------
 
 resource "azurerm_virtual_machine_extension" "ama_kurento" {
-  count                      = local.vm_instance_count
+  count                      = local.kurento_instance_count
   name                       = "AzureMonitorLinuxAgent"
   virtual_machine_id         = azurerm_linux_virtual_machine.kurento[count.index].id
   publisher                  = "Microsoft.Azure.Monitor"
@@ -273,7 +273,7 @@ resource "azurerm_virtual_machine_extension" "ama_kurento" {
 }
 
 resource "azurerm_virtual_machine_extension" "ama_processing" {
-  count                      = local.vm_instance_count
+  count                      = local.processing_instance_count
   name                       = "AzureMonitorLinuxAgent"
   virtual_machine_id         = azurerm_linux_virtual_machine.processing[count.index].id
   publisher                  = "Microsoft.Azure.Monitor"
@@ -289,14 +289,14 @@ resource "azurerm_virtual_machine_extension" "ama_processing" {
 # ---------------------------------------------------------------------------
 
 resource "azurerm_role_assignment" "kurento_dcr_metrics_publisher" {
-  count                = local.vm_instance_count
+  count                = local.kurento_instance_count
   scope                = azurerm_monitor_data_collection_rule.kurento.id
   role_definition_name = "Monitoring Metrics Publisher"
   principal_id         = azurerm_linux_virtual_machine.kurento[count.index].identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "processing_dcr_metrics_publisher" {
-  count                = local.vm_instance_count
+  count                = local.processing_instance_count
   scope                = azurerm_monitor_data_collection_rule.processing.id
   role_definition_name = "Monitoring Metrics Publisher"
   principal_id         = azurerm_linux_virtual_machine.processing[count.index].identity[0].principal_id
@@ -307,7 +307,7 @@ resource "azurerm_role_assignment" "processing_dcr_metrics_publisher" {
 # ---------------------------------------------------------------------------
 
 resource "azurerm_monitor_data_collection_rule_association" "kurento" {
-  count                   = local.vm_instance_count
+  count                   = local.kurento_instance_count
   name                    = "${var.resource_prefix}-kurento-dcra-${count.index + 1}"
   target_resource_id      = azurerm_linux_virtual_machine.kurento[count.index].id
   data_collection_rule_id = azurerm_monitor_data_collection_rule.kurento.id
@@ -319,7 +319,7 @@ resource "azurerm_monitor_data_collection_rule_association" "kurento" {
 }
 
 resource "azurerm_monitor_data_collection_rule_association" "processing" {
-  count                   = local.vm_instance_count
+  count                   = local.processing_instance_count
   name                    = "${var.resource_prefix}-processing-dcra-${count.index + 1}"
   target_resource_id      = azurerm_linux_virtual_machine.processing[count.index].id
   data_collection_rule_id = azurerm_monitor_data_collection_rule.processing.id

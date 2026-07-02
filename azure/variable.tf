@@ -170,10 +170,55 @@ variable "appgw_allowed_cidrs" {
   description = "Source CIDR blocks allowed inbound to Application Gateway listener ports. Use specific /32 or subnet ranges to restrict access."
 }
 
-variable "vm_size" {
+variable "use_ssl_for_app_gateway" {
+  type        = bool
+  default     = true
+  description = "If true, the kurento and processing Application Gateway listeners use HTTPS with the certificate from appgatewaycert.pfx (located next to the Terraform files). If false, infrastructure is left as HTTP (current behavior)."
+}
+
+variable "app_gateway_cert_password" {
+  type        = string
+  default     = "1234"
+  sensitive   = true
+  description = "Password protecting appgatewaycert.pfx. Only used when use_ssl_for_app_gateway is true."
+}
+
+variable "kurento_vm_size" {
   type        = string
   default     = "Standard_B1s"
-  description = "VM size for kurento and processing instances. Must be available in all deployment availability zones (e.g. Standard_B2ats_v2 when Standard_B1s has capacity restrictions)."
+  description = "VM size for kurento instances. Must be available in all deployment availability zones (e.g. Standard_B2ats_v2 when Standard_B1s has capacity restrictions)."
+}
+
+variable "processing_vm_size" {
+  type        = string
+  default     = "Standard_B1s"
+  description = "VM size for processing instances. Must be available in all deployment availability zones (e.g. Standard_B2ats_v2 when Standard_B1s has capacity restrictions)."
+}
+
+variable "kurento_node_count" {
+  type        = number
+  default     = 1
+  description = "Scaling unit for kurento instances. In regions with 2 availability zones, total instances = kurento_node_count * 2 (one set per zone, e.g. 1 -> 2 instances, 2 -> 4 instances), distributed with odd instance numbers in zone A and even instance numbers in zone B. In regions without availability zones, total instances = kurento_node_count."
+  validation {
+    condition     = var.kurento_node_count >= 1
+    error_message = "kurento_node_count must be >= 1."
+  }
+}
+
+variable "processing_node_count" {
+  type        = number
+  default     = 1
+  description = "Scaling unit for processing instances. In regions with 2 availability zones, total instances = processing_node_count * 2 (one set per zone, e.g. 1 -> 2 instances, 2 -> 4 instances), distributed with odd instance numbers in zone A and even instance numbers in zone B. In regions without availability zones, total instances = processing_node_count."
+  validation {
+    condition     = var.processing_node_count >= 1
+    error_message = "processing_node_count must be >= 1."
+  }
+}
+
+variable "ssh_allowed_cidrs" {
+  type        = list(string)
+  default     = ["*"]
+  description = "Source IP addresses/CIDR blocks allowed to SSH (TCP/22) into the kurento and processing VMs. Use \"*\" to allow access from anywhere, or an empty list ([]) to disable SSH access entirely."
 }
 
 # ---------------------------------------------------------------------------
@@ -232,4 +277,10 @@ variable "aws_transcribe_log_file_path" {
   type        = string
   default     = "/var/log/awstranscr/logs.log"
   description = "Transcribe service log file path collected by the Azure Monitor Agent."
+}
+
+variable "fileshare_quota" {
+  type        = number
+  default     = 50
+  description = "File share storage quota in GB"
 }

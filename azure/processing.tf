@@ -28,17 +28,17 @@ data "azurerm_image" "processing_latest_image" {
 # ---------------------------------------------------------------------------
 
 resource "azurerm_public_ip" "processing_pip" {
-  count               = local.vm_instance_count
+  count               = local.processing_instance_count
   name                = "${var.resource_prefix}-processing-pip-${count.index + 1}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Static"
   sku                 = "Standard"
-  zones               = local.location_supports_zones ? [local.vm_availability_zones[count.index]] : null
+  zones               = local.location_supports_zones ? [local.vm_availability_zones[count.index % length(local.vm_availability_zones)]] : null
 }
 
 resource "azurerm_network_interface" "processing_nic" {
-  count               = local.vm_instance_count
+  count               = local.processing_instance_count
   name                = "${var.resource_prefix}-processing-nic-${count.index + 1}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
@@ -56,13 +56,13 @@ resource "azurerm_network_interface" "processing_nic" {
 # ---------------------------------------------------------------------------
 
 resource "azurerm_linux_virtual_machine" "processing" {
-  count               = local.vm_instance_count
+  count               = local.processing_instance_count
   name                = "${var.resource_prefix}-processing-${count.index + 1}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  size                = var.vm_size
+  size                = var.processing_vm_size
   admin_username      = "ubuntu"
-  zone                = local.location_supports_zones ? local.vm_availability_zones[count.index] : null
+  zone                = local.location_supports_zones ? local.vm_availability_zones[count.index % length(local.vm_availability_zones)] : null
 
   network_interface_ids = [
     azurerm_network_interface.processing_nic[count.index].id,
