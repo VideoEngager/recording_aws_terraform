@@ -2,26 +2,14 @@
 # Dynamic "Latest" Image Lookup
 # ---------------------------------------------------------------------------
 
-data "azurerm_images" "kurento_images" {
-  resource_group_name = var.image_rg_name
-  tags_filter = {
-    Version = var.image_tag_version
-  }
-}
-
-locals {
-  kurento_matching_image_names = [
-    for img in data.azurerm_images.kurento_images.images : img.name
-    if startswith(img.name, var.kurento_image_name_prefix)
-  ]
-  kurento_sorted_descending = reverse(sort(local.kurento_matching_image_names))
-  kurento_latest_image_name = length(local.kurento_sorted_descending) > 0 ? local.kurento_sorted_descending[0] : ""
-}
-
-data "azurerm_image" "kurento_latest_image" {
-  name                = local.kurento_latest_image_name
+data "azurerm_shared_image_version" "kurento_version" {
+  count               = var.kurento_image_resource_id == "" ? 1 : 0
+  name                = var.image_tag_version
+  image_name          = var.kurento_image_name_prefix
+  gallery_name        = var.image_gallery_name
   resource_group_name = var.image_rg_name
 }
+
 
 # ---------------------------------------------------------------------------
 #  Kurento Public IP Address
@@ -86,7 +74,7 @@ resource "azurerm_linux_virtual_machine" "kurento" {
     storage_account_type = "Standard_LRS"
   }
 
-  source_image_id = data.azurerm_image.kurento_latest_image.id
+  source_image_id = var.kurento_image_resource_id != "" ? var.kurento_image_resource_id : data.azurerm_shared_image_version.kurento_version.0.id
 
   user_data = base64encode(templatefile("${path.module}/kurento_startup.sh.tftpl", {
     storage_account_name = azurerm_storage_account.sa.name

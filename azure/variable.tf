@@ -15,17 +15,22 @@ variable "image_rg_name" {
 
 variable "kurento_image_name_prefix" {
   type    = string
-  default = "kurento-prod-image-"
+  default = "kurento-prod-image"
 }
 
 variable "processing_image_name_prefix" {
   type    = string
-  default = "processing-prod-image-"
+  default = "processing-prod-image"
+}
+
+variable "image_gallery_name" {
+  type    = string
+  default = "videoengager_recording"
 }
 
 variable "image_tag_version" {
   type    = string
-  default = "v1"
+  default = "8.7.5"
 }
 
 variable "min_port" {
@@ -284,3 +289,16 @@ variable "fileshare_quota" {
   default     = 50
   description = "File share storage quota in GB"
 }
+
+variable "kurento_image_resource_id" {
+  type        = string
+  default     = ""
+  description = "Shared Gallery Resource ID of the Kurento image to use. If empty, the latest image with the specified version will be used."
+}
+
+variable "processing_image_resource_id" {
+  type        = string
+  default     = ""
+  description = "Shared Gallery Resource ID of the Processing image to use. If empty, the latest image with the specified version will be used."
+}
+

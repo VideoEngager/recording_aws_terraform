@@ -2,24 +2,11 @@
 # Dynamic "Latest" Image Lookup
 # ---------------------------------------------------------------------------
 
-data "azurerm_images" "processing_images" {
-  resource_group_name = var.image_rg_name
-  tags_filter = {
-    Version = var.image_tag_version
-  }
-}
-
-locals {
-  processing_matching_image_names = [
-    for img in data.azurerm_images.processing_images.images : img.name
-    if startswith(img.name, var.processing_image_name_prefix)
-  ]
-  processing_sorted_descending = reverse(sort(local.processing_matching_image_names))
-  processing_latest_image_name = length(local.processing_sorted_descending) > 0 ? local.processing_sorted_descending[0] : ""
-}
-
-data "azurerm_image" "processing_latest_image" {
-  name                = local.processing_latest_image_name
+data "azurerm_shared_image_version" "processing_version" {
+  count               = var.processing_image_resource_id == "" ? 1 : 0
+  name                = var.image_tag_version
+  image_name          = var.processing_image_name_prefix
+  gallery_name        = var.image_gallery_name
   resource_group_name = var.image_rg_name
 }
 
@@ -86,7 +73,7 @@ resource "azurerm_linux_virtual_machine" "processing" {
     storage_account_type = "Standard_LRS"
   }
 
-  source_image_id = data.azurerm_image.processing_latest_image.id
+  source_image_id = var.processing_image_resource_id != "" ? var.processing_image_resource_id : data.azurerm_shared_image_version.processing_version.0.id
 
   user_data = base64encode(templatefile("${path.module}/processing_startup.sh.tftpl", {
     storage_account_name = azurerm_storage_account.sa.name

@@ -80,6 +80,8 @@ Key variables (see `variable.tf` for the full list and defaults):
 | `location` | Azure region to deploy into (default `germanywestcentral`). |
 | `image_rg_name` | Resource group containing the shared Kurento/Processing managed images. |
 | `image_tag_version` | `Version` tag used to select the images (also tagged on the created VMs). |
+| `kurento_image_resource_id` | Shared Gallery Resource ID of the Kurento image to use. If empty, the latest image with the specified version will be used. |
+| `processing_image_resource_id` | Shared Gallery Resource ID of the Processing image to use. If empty, the latest image with the specified version will be used. |
 | `kurento_vm_size` | VM SKU for the Kurento instances. |
 | `processing_vm_size` | VM SKU for the Processing instances. |
 | `kurento_node_count` | Scaling unit for Kurento instances (default `1`). In regions with 2 availability zones, total instances = `kurento_node_count * 2` (odd instance numbers in zone A, even in zone B); otherwise total instances = `kurento_node_count`. |

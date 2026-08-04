@@ -1,12 +1,17 @@
 # Local .terraform directories
 **/.terraform/*
-
+**/states/*
+**/var_files/*
 # .tfstate files
 *.tfstate
 *.tfstate.*
-
+*.tf.*
+*.tfvars.*
 # Crash log files
 crash.log
+
+# TLS/SSL certificates (secrets) used by the Azure Application Gateway
+*.pfx
 
 # Ignore any .tfvars files that are generated automatically for each Terraform run. Most
 # .tfvars files are managed as part of configuration and so should be included in
