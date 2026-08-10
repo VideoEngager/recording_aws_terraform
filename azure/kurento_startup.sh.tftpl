@@ -1,0 +1,68 @@
+#!/bin/bash
+# startup.sh.tftpl
+
+echo "Starting custom initialization..." > /var/log/startup-script.log
+apt-get update -y
+apt-get install -y cifs-utils
+
+sleep 30
+touch /etc/profile.d/load_env.sh
+EXTERNAL_IP=`dig +short myip.opendns.com @resolver1.opendns.com`
+{
+
+    echo "export COTURN_LISTENER_PORT=\"${coturn_listener_port}\""
+    echo "export COTURN_ALT_LISTENER_PORT=\"${coturn_alt_listener_port}\""
+
+    echo "export KURENTO_HOST_IP=\"$EXTERNAL_IP\""
+    echo "export EXTERNAL_IP=\"$EXTERNAL_IP\""
+    echo "export INTERNAL_IP=\"${internal_ip}\""
+    echo "export TURN_SERVER_USERNAME=\"${turn_server_username}\""
+    echo "export TURN_SERVER_PASSWORD=\"${turn_server_password}\""
+    echo "export TURN_SERVER_MIN_PORT=\"${turn_server_min_port}\""
+    echo "export TURN_SERVER_MAX_PORT=\"${turn_server_max_port}\""
+
+    echo "export MEDIA_DIR=\"${media_output_dir}\""
+} >> /etc/profile.d/load_env.sh
+
+
+
+
+chmod 440 /etc/profile.d/load_env.sh
+sudo chown ubuntu:ubuntu /etc/profile.d/load_env.sh
+set -a; source /etc/profile.d/load_env.sh; set +a
+
+echo "Render turnserver config file"
+envsubst '$COTURN_LISTENER_PORT,$COTURN_ALT_LISTENER_PORT,$EXTERNAL_IP,$INTERNAL_IP,$TURN_SERVER_USERNAME,$TURN_SERVER_PASSWORD,$TURN_SERVER_MIN_PORT,$TURN_SERVER_MAX_PORT' < /home/ubuntu/turnserver-template.conf | sudo tee /etc/turnserver.conf
+envsubst '$COTURN_LISTENER_PORT,$EXTERNAL_IP,$TURN_SERVER_USERNAME,$TURN_SERVER_PASSWORD' < /home/ubuntu/launch-kms-tempate.sh | sudo tee /usr/local/bin/launch-kms.sh
+sudo touch /var/log/turnserver/turnserver.log
+sudo chmod 777 /var/log/turnserver/turnserver.log
+
+echo "turnURL=$TURN_SERVER_USERNAME:$TURN_SERVER_PASSWORD@$EXTERNAL_IP:$COTURN_LISTENER_PORT" > /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
+echo "externalIPv4=$EXTERNAL_IP" >> /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
+echo "iceTcp=0" >> /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
+echo "minPort=$TURN_SERVER_MIN_PORT" >> /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini
+echo "maxPort=$TURN_SERVER_MAX_PORT" >> /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini
+
+
+# Set up Azure File Share credentials securely
+mkdir -p "$MEDIA_DIR"
+mkdir -p /etc/smbcredentials
+
+cat <<EOF > /etc/smbcredentials/${storage_account_name}.cred
+username=${storage_account_name}
+password=${storage_account_key}
+EOF
+
+chmod 600 /etc/smbcredentials/${storage_account_name}.cred
+
+# Add to fstab and mount
+echo "//${storage_account_name}.file.core.windows.net/${file_share_name} $MEDIA_DIR cifs nofail,credentials=/etc/smbcredentials/${storage_account_name}.cred,dir_mode=0777,file_mode=0777,serverino,nosharesock,actimeo=30 0 0" >> /etc/fstab
+mount -a
+
+echo "Launching Media Server..."
+sudo systemctl stop kms
+sudo systemctl stop coturn
+sudo systemctl start kms
+sudo systemctl start coturn
+
+echo "Initialization complete!" >> /var/log/startup-script.log
