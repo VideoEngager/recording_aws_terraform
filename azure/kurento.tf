@@ -22,7 +22,7 @@ resource "azurerm_public_ip" "kurento_pip" {
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Static"
   sku                 = "Standard"
-  zones               = local.location_supports_zones ? [local.vm_availability_zones[count.index % length(local.vm_availability_zones)]] : null
+  zones               = local.location_supports_zones ? [var.vm_availability_zones[count.index % length(var.vm_availability_zones)]] : null
 }
 
 resource "azurerm_network_interface" "kurento_nic" {
@@ -50,7 +50,7 @@ resource "azurerm_linux_virtual_machine" "kurento" {
   location            = azurerm_resource_group.rg.location
   size                = var.kurento_vm_size
   admin_username      = "ubuntu"
-  zone                = local.location_supports_zones ? local.vm_availability_zones[count.index % length(local.vm_availability_zones)] : null
+  zone                = local.location_supports_zones ? var.vm_availability_zones[count.index % length(var.vm_availability_zones)] : null
 
   network_interface_ids = [
     azurerm_network_interface.kurento_nic[count.index].id,
@@ -71,7 +71,7 @@ resource "azurerm_linux_virtual_machine" "kurento" {
 
   os_disk {
     caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+    storage_account_type = "StandardSSD_LRS"
   }
 
   source_image_id = var.kurento_image_resource_id != "" ? var.kurento_image_resource_id : data.azurerm_shared_image_version.kurento_version.0.id

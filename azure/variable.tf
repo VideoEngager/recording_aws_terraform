@@ -33,6 +33,12 @@ variable "image_tag_version" {
   default = "8.7.5"
 }
 
+variable "vm_availability_zones" {
+  type    = list(string)
+  description = "List of availability zones to deploy VMs into.if empty or contains only one zone, VMs will be deployed without zone support."
+  default = ["1", "2"]
+}
+
 variable "min_port" {
   type        = number
   default     = 55002

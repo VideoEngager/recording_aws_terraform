@@ -70,14 +70,14 @@ resource "azurerm_public_ip" "appgw_pip" {
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Static"
   sku                 = "Standard"
-  zones               = local.location_supports_zones ? local.vm_availability_zones : null
+  zones               = local.location_supports_zones ? var.vm_availability_zones : null
 }
 
 resource "azurerm_application_gateway" "recording" {
   name                = "${var.resource_prefix}-appgw"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  zones               = local.location_supports_zones ? local.vm_availability_zones : null
+  zones               = local.location_supports_zones ? var.vm_availability_zones : null
 
   sku {
     name     = "Standard_v2"
