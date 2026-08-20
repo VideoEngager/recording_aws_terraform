@@ -232,6 +232,12 @@ variable "ssh_allowed_cidrs" {
   description = "Source IP addresses/CIDR blocks allowed to SSH (TCP/22) into the kurento and processing VMs. Use \"*\" to allow access from anywhere, or an empty list ([]) to disable SSH access entirely."
 }
 
+variable "use_nat_gw" {
+  default     = false
+  type        = bool
+  description = "If true, processing nodes are placed in private subnet(s) with only private IPs and use NAT Gateway(s) for outbound internet. In multi-AZ regions, one zonal NAT Gateway and private subnet is created per availability zone so processing VMs remain spread across zones. If false, processing nodes stay in the public subnet with public IP addresses. Kurento nodes are unaffected."
+}
+
 # ---------------------------------------------------------------------------
 # Monitoring / Logging (Azure Monitor - equivalent of AWS CloudWatch)
 # ---------------------------------------------------------------------------

@@ -15,7 +15,7 @@ data "azurerm_shared_image_version" "processing_version" {
 # ---------------------------------------------------------------------------
 
 resource "azurerm_public_ip" "processing_pip" {
-  count               = local.processing_instance_count
+  count               = var.use_nat_gw ? 0 : local.processing_instance_count
   name                = "${var.resource_prefix}-processing-pip-${count.index + 1}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
@@ -32,9 +32,9 @@ resource "azurerm_network_interface" "processing_nic" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.subnet.id
+    subnet_id                     = length(azurerm_subnet.processing_private) > 0 ? azurerm_subnet.processing_private[count.index % length(azurerm_subnet.processing_private)].id : azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.processing_pip[count.index].id
+    public_ip_address_id          = try(azurerm_public_ip.processing_pip[count.index].id, null)
   }
 }
 

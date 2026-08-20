@@ -15,7 +15,7 @@
 
 locals {
   # Custom Log Analytics table names must be alphanumeric/underscore and end in _CL.
-  log_table_suffix   = replace("${var.tenant_id}_${var.infrastructure_purpose}", "-", "_")
+  log_table_suffix   = replace("${var.tenant_id}_${var.infrastructure_purpose}_${random_string.sa_suffix.result}", "-", "_")
   kurento_table_name = "kurento_${local.log_table_suffix}_CL"
   recsvc_table_name  = "recsvc_${local.log_table_suffix}_CL"
 

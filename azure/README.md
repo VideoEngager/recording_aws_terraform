@@ -11,6 +11,7 @@ This directory deploys the recording infrastructure on **Microsoft Azure**, mirr
 | Processing Worker (EC2)             | `azurerm_linux_virtual_machine` (processing)                 |
 | EFS                                 | Azure Files (`azurerm_storage_account` + `azurerm_storage_share`) |
 | VPC                                 | Virtual Network (VNet) + Subnets                              |
+| NAT Gateway (processing egress)     | Azure NAT Gateway + Standard public IP                        |
 | Security Groups                     | Network Security Groups (NSGs)                                |
 | CloudWatch Logs / Agent             | Log Analytics Workspace + Azure Monitor Agent (AMA)           |
 | AMI                                 | Azure Managed Image (looked up dynamically by tag in a shared image resource group) |
@@ -90,6 +91,7 @@ Key variables (see `variable.tf` for the full list and defaults):
 | `app_gateway_cert_password` | Password protecting `appgatewaycert.pfx`. |
 | `appgw_allowed_cidrs` | List of source CIDR blocks allowed inbound to the Application Gateway listener ports (kurento, processing, and any enabled add-on services). Defaults to `["0.0.0.0/0"]` (open to the internet) — restrict this to known `/32` client IPs or specific subnet ranges for any real deployment to reduce exposure. |
 | `ssh_allowed_cidrs` | List of source IP addresses/CIDR blocks allowed to SSH (TCP/22) into the Kurento and Processing VMs. Defaults to `["*"]` (open to anyone); set to an empty list `[]` to disable SSH access entirely. |
+| `use_nat_gw` | If `true`, processing nodes are placed in **private subnets with private IPs only**; outbound internet goes through Azure NAT Gateway(s). In regions with multiple availability zones, one private subnet + zonal NAT Gateway is created per zone and processing VMs stay spread across those zones (same odd/even zone placement as without NAT). If `false` (default), processing nodes stay in the public subnet with public IPs. Kurento nodes always remain in the public subnet with public IPs. |
 | `use_archiver_service` / `use_verint_connector_service` / `use_aws_transcribe_service` | Optional processing add-on services. |
 | `genesys_webdav_server_url` / `genesys_username` / `genesys_password` | Genesys WebDAV integration settings. |
 | `reporter_host` / `reporter_path` | RecAPI endpoint used by the processing service. |
@@ -133,6 +135,9 @@ Set overrides either via a `*.auto.tfvars` file in this directory or via `TF_VAR
 | --- | --- |
 | `appgw_public_ip` | Public IP of the Application Gateway frontend. |
 | `appgw_fqdn` | FQDN of the Application Gateway public IP. |
+| `nat_gateway_public_ip` | List of public IPs of the processing NAT Gateway(s) when `use_nat_gw = true` (one per availability zone); otherwise empty. |
+| `kurento_public_ips` | Public IP addresses of all kurento VMs. |
+| `processing_public_ips` | Public IP addresses of all processing VMs when `use_nat_gw = false`; empty when NAT Gateway is enabled. |
 | `log_analytics_workspace_id` / `log_analytics_workspace_name` | Log Analytics workspace collecting instance logs. |
 | `kurento_log_table_name` | Custom Log Analytics table with kurento + coturn logs (query via KQL). |
 | `processing_log_table_name` | Custom Log Analytics table with recsvc/archiver/verint/transcribe logs (query via KQL). |

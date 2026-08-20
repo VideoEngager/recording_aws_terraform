@@ -21,7 +21,10 @@ resource "azurerm_storage_share" "fs" {
 resource "azurerm_storage_account_network_rules" "sa_rules" {
   storage_account_id         = azurerm_storage_account.sa.id
   default_action             = "Deny"
-  virtual_network_subnet_ids = [azurerm_subnet.subnet.id]
+  virtual_network_subnet_ids = concat(
+    [azurerm_subnet.subnet.id],
+    azurerm_subnet.processing_private[*].id
+  )
   bypass                     = ["AzureServices", "Metrics", "Logging"]
   # Allow the public IP of the machine running Terraform!
   ip_rules = [chomp(data.http.my_public_ip.response_body)]
